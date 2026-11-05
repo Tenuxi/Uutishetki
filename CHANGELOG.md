@@ -12,7 +12,8 @@
 
 ### Tarkistukset
 - Valikon avaus/sulkeminen, reitit suodattimiin ja tietoihin, päivitysaika, 48 dp kosketusalue ja listan yläväli tarkistettu koodista.
-- XML-resurssien rakenne tarkistettu. Ei uusia ulkoasuyksikkötestejä eikä paikallista Android-buildia; GitHub Actions ajaa nykyiset testit, lintin ja APK-käännöksen ennen julkaisua.
+- XML-resurssien rakenne tarkistettu. Ei uusia ulkoasuyksikkötestejä eikä paikallista Android-buildia; [Actions-ajo 42011336514](https://github.com/Tenuxi/Uutishetki/actions/runs/42011336514) läpäisi 15 nykyistä testiä, Android Lintin ja APK-käännöksen.
+- [Julkaisuajo 42011735261](https://github.com/Tenuxi/Uutishetki/actions/runs/42011735261) onnistui; APK:n allekirjoitus, applicationId, versionName 0.2.1 ja versionCode 3 varmennettu. [Lataa APK](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.2.1/Uutishetki-0.2.1.apk).
 - Ei emulaattori- tai laitetestiä: todellinen vieritys, läpikuultavuus, suuret fontit ja käynnistyskuvakkeen laitekohtainen rajaus jäävät laitteella varmistettaviksi.
 
 ### Asentaminen ja rajoitteet
