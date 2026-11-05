@@ -15,7 +15,9 @@
 
 ### Tarkistukset
 - Viiden tuotantokäyttöön valitun RSS-osoitteen HTTP 200 ja XML-rakenne tarkistettu 5.11.2026.
-- Kahdeksan parseri- ja suodatustestiä sekä debug-APK-käännös läpäisivät Actions-ajon. Lintin havaitsema API 27 -teema-asetus korjattu; korjauksen CI-varmistus käynnissä.
+- [Actions-ajo 41977184639](https://github.com/Tenuxi/Uutishetki/actions/runs/41977184639) onnistui: kahdeksan JUnit-testiä, Android Lint ja debug-APK-käännös.
+- Lint: 0 virhettä ja 10 varoitusta (uudempia riippuvuus-/SDK-versioita, Android 12:n dataExtractionRules ja KTX-tyylisuositukset). Tarkistuksia ei poistettu tai vaiennettu.
+- [Ladattava debug-testiversio](https://github.com/Tenuxi/Uutishetki/actions/runs/41977184639/artifacts/13392685128), ei pysyvällä julkaisuavaimella allekirjoitettu release.
 - Paikallista Android-käännöstä ei ajettu: ympäristössä ei ole JDK:ta tai Android SDK:ta.
 - Ei emulaattori- tai fyysisen laitteen testiä. Allekirjoitettua APK-julkaisua ei vielä varmistettu.
 

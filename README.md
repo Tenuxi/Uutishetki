@@ -72,7 +72,7 @@ SQLite tallentaa enintään 300 uutista/lähde (yhteensä 1 500); onnistuneen p�
 
 Tallennetut uutiset luetaan IO-säikeellä ennen hakua. Viisi lähdettä haetaan rinnakkain ja tallennetaan erillisinä transaktioina. Yhteys 10 s, lukeminen 15 s ja koko pyyntö 25 s; automaattiset verkkouusinnat pois. Syötevastaus enintään 2 MiB. Automaattinen päivitys etualalle tullessa aikaisintaan 5 minuutin välein, käsin vähintään 10 sekunnin välein. Palvelimen HTTP-välimuisti sallitaan 5 minuutiksi myös käsin päivitettäessä. Ei taustatyöajastinta. Vakaat lähde + GUID -avaimet (varalla linkki ilman queryä) estävät toistot ja Compose-listan avaimet säilyttävät näkyvän uutisen selauskohdan.
 
-Syötteet ja kuvat haetaan suoraan julkaisijoilta; ne saavat normaalit verkkopyyntötiedot kuten IP-osoitteen. Paikallisen kannan varmuuskopiointi on poistettu käytöstä. Tekstin koko seuraa Androidin asetusta, suodatuspaneeli vierii ja teaser rajautuu kahdelle riville.
+Syötteet ja kuvat haetaan suoraan julkaisijoilta; ne saavat normaalit verkkopyyntötiedot kuten IP-osoitteen. Pilvivarmuuskopiointi on poistettu käytöstä (`allowBackup=false`); Android 12+:n valmistajakohtaista laitteesta toiseen -siirtoa ei ole erikseen rajattu dataExtractionRules-säännöillä. Tekstin koko seuraa Androidin asetusta, suodatuspaneeli vierii ja teaser rajautuu kahdelle riville.
 
 ## Tarkistukset
 
