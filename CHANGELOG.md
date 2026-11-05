@@ -13,7 +13,8 @@
 ### Tarkistukset
 - Koodista tarkistettu paneelin avaus ja sulkemisreitit, heti vaikuttavat valinnat ilman sulkemista, nykyisen ViewModelin tallennuskutsut sekä footerin pysyminen samassa vieritettävässä sisällössä.
 - Käytetyt drawer-API:t tarkistettu käytössä olevan Material 3 -version lähdekoodista. XML-resurssit ja muutoskuvauksen rakenne tarkistettu paikallisesti.
-- GitHub Actions ajaa nykyiset 15 testiä, lintin ja APK-käännöksen; ei uusia ulkoasuyksikkötestejä tai paikallista Android-buildia.
+- [Actions-ajo 42013418958](https://github.com/Tenuxi/Uutishetki/actions/runs/42013418958) läpäisi 15 nykyistä testiä, Android Lintin ja APK-käännöksen. Ei uusia ulkoasuyksikkötestejä tai paikallista Android-buildia.
+- [Julkaisuajo 42013755129](https://github.com/Tenuxi/Uutishetki/actions/runs/42013755129) onnistui ja varmisti allekirjoituksen, applicationId:n, version 0.2.2 sekä versionCoden 4. [Lataa APK](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.2.2/Uutishetki-0.2.2.apk).
 - Ei emulaattori- tai laitetestiä. Paneelin animaatio, kosketukset, TalkBack, suuri fonttikoko ja pieni näyttö jäävät laitteella varmistettaviksi.
 
 ### Rajoitteet
