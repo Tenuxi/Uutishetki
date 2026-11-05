@@ -9,9 +9,13 @@
 - SQLite-offline-otsikot ja -kuvaukset, rajatut välimuistit, rinnakkaiset haut, virhetilat ja vetopäivitys.
 - Version tietonäkymä, Gradle wrapper sekä GitHub Actionsin tarkistus- ja allekirjoitettu APK-julkaisupolku.
 
+### Korjaukset
+- Android 8.0:n teemasta poistettu API 27:ää vaatinut navigaatiopalkin asetus; reunapalkit hoitaa Activityn yhteensopiva edge-to-edge-toteutus.
+- CI käyttää Ubuntu 24.04:n valmista Android SDK:ta. Pelkät Markdown-muutokset eivät käynnistä uutta main-buildia.
+
 ### Tarkistukset
 - Viiden tuotantokäyttöön valitun RSS-osoitteen HTTP 200 ja XML-rakenne tarkistettu 5.11.2026.
-- Kohdennetut JUnit-testit parserille ja suodatukselle lisätty; CI ajaa ne sekä lintin ja debug-käännöksen.
+- Kahdeksan parseri- ja suodatustestiä sekä debug-APK-käännös läpäisivät Actions-ajon. Lintin havaitsema API 27 -teema-asetus korjattu; korjauksen CI-varmistus käynnissä.
 - Paikallista Android-käännöstä ei ajettu: ympäristössä ei ole JDK:ta tai Android SDK:ta.
 - Ei emulaattori- tai fyysisen laitteen testiä. Allekirjoitettua APK-julkaisua ei vielä varmistettu.
 
