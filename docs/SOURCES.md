@@ -23,7 +23,7 @@ APK ei sisällä julkaisijoiden uutisaineistoa: kukin käyttäjän laite lataa s
 
 ## Kategoriakartoitus
 
-`Topic.aliases` on kartoituksen auktoriteetti. Vain syötteen `category`-arvoja verrataan pienaakkosin; otsikosta tai kuvaustekstistä ei arvata aihetta. Yhdellä uutisella voi olla useita aiheita (Yle toimittaa useita kategorioita). Lähde- ja aihevalinta yhdistetään AND-operaatiolla. Tuntematon kategoria näkyy Kaikki-aiheessa.
+`Topic.aliases` on kartoituksen auktoriteetti. Yleissyötteen `category`-arvoja verrataan pienaakkosin (0.2.0:n varmennetuilla Digi-lisäsyötteillä on lisäksi alla kuvattu syötekohtainen luokka); otsikosta tai kuvaustekstistä ei arvata aihetta. Yhdellä uutisella voi olla useita aiheita (Yle toimittaa useita kategorioita). Lähde- ja aihevalinta yhdistetään AND-operaatiolla. Tuntematon kategoria näkyy Kaikki-aiheessa.
 
 | Aihe | Tunnistettavat kategoriat |
 | --- | --- |

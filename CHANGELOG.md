@@ -16,7 +16,8 @@
 
 ### Tarkistukset
 - Bitti-, Digitoday- ja molemmat yleissyötteet tarkistettu 5.11.2026: HTTP 200, kategoriat, kuvaukset, kuvat ja tunnisteet.
-- Kohdennetut testit oletuksille, monivalinnalle, lähdeyhdistelmille, tallennusmuodon palautukselle, tyhjälle valinnalle, Digi-metatiedoille ja syötteiden päällekkäisyyksille. CI-varmistus tehdään ennen APK-julkaisua.
+- Kohdennetut testit oletuksille, monivalinnalle, lähdeyhdistelmille, tallennusmuodon palautukselle, tyhjälle valinnalle, Digi-metatiedoille ja syötteiden päällekkäisyyksille. [Actions-tarkistus 41982653524](https://github.com/Tenuxi/Uutishetki/actions/runs/41982653524) onnistui: 15 testiä, Android Lint ja APK-käännös.
+- [Julkaisuajo 41982979155](https://github.com/Tenuxi/Uutishetki/actions/runs/41982979155) varmisti APK:n allekirjoituksen, applicationId:n, version 0.2.0 ja versionCoden 2. [Lataa APK](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.2.0/Uutishetki-0.2.0.apk).
 - Ei paikallista Android-buildia, emulaattoria tai laitetestiä. Ulkoasu tarkistettu koodista.
 
 ### Tiedossa olevat puutteet
