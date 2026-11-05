@@ -1,6 +1,6 @@
 # Uutishetki
 
-Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.2.0**, versionCode **2**.
+Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.2.1**, versionCode **3**.
 
 Uutiset näkyvät uusimmat ensin yhteisessä virrassa. Lähdesuodatin ja pysyvä aiheiden monivalinta (oletuksena kaikki paitsi Urheilu), lyhyet RSS-kuvaukset, syötteen kuvat ja alkuperäisten artikkelien avaaminen Custom Tabsissa / selaimessa. Ei mainos-, analytiikka- tai AI-SDK:ita, tilejä eikä palvelinta. Julkaisijoiden sivujen mainoksia, evästeitä ja maksumuureja ei muuteta.
 
@@ -88,3 +88,12 @@ JUnit testaa RSS-kentät, kuvat, HTML-siivouksen, päivämäärät, tunnisteet, 
 Päivitä versio ja versionCode sekä muutosloki, commit ja push main-haaraan. Odota saman commitin Android-työn onnistumista. Tee sitten `git tag -a apk-0.2.0 -m 'Uutishetki 0.2.0'` ja `git push origin apk-0.2.0`. `Julkaise asennettava APK` noutaa juuri kyseisen commitin tarkistetun debug-APK:n, varmentaa tunnisteen/version/allekirjoituksen ja julkaisee sen Releasesiin. Se ei käytä vanhaa kovakoodattua buildia eikä aja testejä uudelleen. Jos main-tarkistus ei vielä ole onnistunut, julkaisu pysähtyy; käynnistä epäonnistunut julkaisu-job uudelleen tarkistuksen valmistuttua.
 
 Tämä on aiemmin valittu ilman Secrets-asetuksia toimiva jakelutapa. `v*`-tagien pysyvän avaimen release-polku on edelleen tarjolla yllä olevien ohjeiden mukaan. Älä julkaise samaa versiota molemmilla tavoilla. Android ei hyväksy eri avaimella allekirjoitettua APK:ta aiemman päälle. Poistaminen nollaa asetukset, mutta normaali saman avaimen päivitys, uudelleenkäynnistys tai uutisten päivitys ei nollaa 0.2.0:n valintoja.
+
+
+## Ulkoasu 0.2.1
+
+Kiinteän, läpikuultavan Roboto-yläpalkin hampurilaisvalikko avaa suodattimet ja tiedot sekä näyttää päivitysajan. Uutislista alkaa heti palkin alta; valinnat näkyvät vain suodatuspaneelissa. Harmaa listatausta, valkoiset kevyesti varjostetut kortit ja mustavalkoinen mukautuva kuvake korvaavat aiemman vihertävän ilmeen. Lähteet, suodatus ja tallennetut asetukset ovat ennallaan.
+
+Roboto Regular on ladattu [Google Fontsin Roboto-lähdereposta](https://github.com/googlefonts/roboto-2/blob/main/src/hinted/Roboto-Regular.ttf), lisenssi [Apache 2.0](docs/Roboto-LICENSE.txt); lisenssi on mukana myös APK:n assets/licenses-hakemistossa. Nimen kirjasin ei riipu puhelinvalmistajan oletusfontista.
+
+Vanhan 0.2.0-version allekirjoitusavain puuttuu. Version 0.2.1 julkaisu tehdään käyttäjän erikseen hyväksymänä uutena asennuksena; vanhan version poistaminen hävittää paikalliset uutiset ja valinnat.

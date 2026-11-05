@@ -19,3 +19,10 @@ Tätä listaa ei ole vielä ajettu laitteella. Android 8+; lisäksi Android 15:n
 - Poista jokainen aihe: Ei aiheita valittu myös haun aikana. Valitse kaikki valitsee aiheet; Palauta oletukset palauttaa myös kaikki lähteet.
 - Tarkista sama Digi-artikkeli yleis- ja lisäsyötteestä: vain yksi kortti, Digi-luokka säilyy.
 - Pieni näyttö ja suuri fontti: tunnus, slogan, päivitysaika ja toimintopainikkeet luettavia. Androidin tilapalkissa tummat kuvakkeet. Kuvattoman kortin reunus erottuu.
+
+
+## 0.2.1 — rajattu kooditarkistus ja laitteella tehtävät tarkistukset
+
+Koodista tarkistettu: valikkopainike avaa DropdownMenun, suodatus/tiedot sulkevat valikon ja avaavat nykyisen paneelin/dialogin. Päivitysaika on valikossa, versio myös tietodialogissa. Suodatuksen yhteenvetoriviä ja sen listapaikkaa ei enää ole. Listan contentPadding käyttää palkin onSizeChanged-korkeutta, yläturva-aluetta ja 8 dp alkuväliä. Lista vierii palkin taakse, palkki piirretään viimeisenä. 48 dp painike, mitattu palkki ja 16 dp sivu-/korttivälit. Kuvakkeen symboli pysyy 108 dp:n adaptive-kuvakkeen keskimmäisessä turva-alueessa.
+
+Laitteella testaamatta: avaa/sulje valikko myös takaisin-painikkeella, valitse suodattimet, avaa tiedot, tarkista päivitysaika ja vieritys palkin alta. Kokeile pientä näyttöä, suurta fonttia, vaaka-asentoa, näyttölovea sekä ele-/kolmen painikkeen navigointia. Tarkista vetopäivityksen ilmaisin ja varjojen reunat. Tarkista kuvake pyöreällä ja pyöristetyllä maskilla sekä Android 13:n teemakuvakkeella. Emulaattoria ei käynnistetty.

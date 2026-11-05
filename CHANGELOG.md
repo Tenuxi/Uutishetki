@@ -1,5 +1,24 @@
 # Muutosloki
 
+## 0.2.1 – 5.11.2026
+
+### Muutokset
+- Kompakti, vieritettäessä paikallaan pysyvä yläpalkki: musta Roboto-nimi, 48 dp:n hampurilaispainike, hieman läpikuultava vaalea tausta ja ohut tumma alareuna.
+- Suodattimet, tiedot, versionumero ja viimeisin päivitysaika löytyvät valikosta. Päänäkymän slogan, erilliset toimintopainikkeet ja suodatusyhteenveto poistettu tilavarauksineen.
+- Listan alkuväli seuraa palkin mitattua korkeutta ja Androidin turva-alueita. Päivityksen ilmaisin näkyy palkin alapuolella.
+- Neutraali vaaleanharmaa listatausta, valkoiset kortit, hillitty sinertävä korostus ja 2 dp:n pehmeä korttivarjo. Ohut reunus ja pyöristetyt kulmat säilyvät.
+- Mustavalkoinen vektorimuotoinen käynnistyskuvake mukautuvilla rajauksilla ja Android 13+:n teemakuvaketuella.
+- Uutislähteet, suodatuslogiikka, tallennus ja applicationId ovat ennallaan.
+
+### Tarkistukset
+- Valikon avaus/sulkeminen, reitit suodattimiin ja tietoihin, päivitysaika, 48 dp kosketusalue ja listan yläväli tarkistettu koodista.
+- XML-resurssien rakenne tarkistettu. Ei uusia ulkoasuyksikkötestejä eikä paikallista Android-buildia; GitHub Actions ajaa nykyiset testit, lintin ja APK-käännöksen ennen julkaisua.
+- Ei emulaattori- tai laitetestiä: todellinen vieritys, läpikuultavuus, suuret fontit ja käynnistyskuvakkeen laitekohtainen rajaus jäävät laitteella varmistettaviksi.
+
+### Asentaminen ja rajoitteet
+- Version 0.2.0 alkuperäistä allekirjoitusavainta ei ole tallessa. Käyttäjä hyväksyi erillisen asennuksen vanhan päälle asentuvan päivityksen sijaan. APK julkaistaan nykyisellä testiallekirjoituspolulla; vanhan sovelluksen poistaminen voi olla tarpeen ja poistaa samalla paikallisen datan sekä valinnat.
+- Sovellus itsessään ei nollaa tallennettuja valintoja. Niiden säilymistä poistamisen yli ei voida luvata. Pysyvän avaimen käyttöönotto jää erilliseksi jatkotoimeksi.
+
 ## 0.2.0 – 5.11.2026
 
 ### Lisäykset

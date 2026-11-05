@@ -11,9 +11,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.SystemBarStyle
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.sp
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -30,6 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -50,18 +54,26 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.light(0xFFF2F3EC.toInt(), 0xFF28594E.toInt())
+            navigationBarStyle = SystemBarStyle.light(0xFFF4F4F4.toInt(), 0xFF303030.toInt())
         )
         setContent {
             MaterialTheme(colorScheme = lightColorScheme(
-                primary = Color(0xFF28594E), onPrimary = Color.White,
-                background = Color(0xFFE7E9E2), surface = Color(0xFFFFFEFA),
-                onBackground = Color(0xFF202C28), onSurface = Color(0xFF202C28),
-                surfaceVariant = Color(0xFFE6EAE3), onSurfaceVariant = Color(0xFF4B5852)
+                primary = Color(0xFF405D78), onPrimary = Color.White, surfaceTint = Color(0xFF405D78),
+                primaryContainer = Color(0xFFDCE6F0), onPrimaryContainer = Color(0xFF182D40),
+                secondary = Color(0xFF4D6072), onSecondary = Color.White,
+                secondaryContainer = Color(0xFFDCE6F0), onSecondaryContainer = Color(0xFF182D40),
+                tertiary = Color(0xFF4D6072),
+                background = Color(0xFFDEDEDE), surface = Color.White,
+                onBackground = Color(0xFF171717), onSurface = Color(0xFF171717),
+                surfaceVariant = Color(0xFFE8E8E8), onSurfaceVariant = Color(0xFF494949),
+                surfaceContainer = Color(0xFFF3F3F3), surfaceContainerLow = Color(0xFFF7F7F7),
+                surfaceContainerHigh = Color(0xFFEEEEEE), surfaceContainerHighest = Color(0xFFE8E8E8),
+                outline = Color(0xFF777777), outlineVariant = Color(0xFFCCCCCC)
             )) { NewsScreen() }
         }
     }
 }
+private val brandFont = FontFamily(Font(R.font.roboto_regular))
 private val finnishDate = DateTimeFormatter.ofPattern("d.M.yyyy 'klo' HH.mm", Locale.forLanguageTag("fi-FI"))
     .withZone(ZoneId.of("Europe/Helsinki"))
 private fun formatDate(millis: Long) = finnishDate.format(Instant.ofEpochMilli(millis))
@@ -80,6 +92,13 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
     val active = source != null || selection.topics != Topic.entries.toSet()
     var filters by rememberSaveable { mutableStateOf(false) }
     var about by rememberSaveable { mutableStateOf(false) }
+    var menu by rememberSaveable { mutableStateOf(false) }
+    val density = LocalDensity.current
+    val safePadding = WindowInsets.safeDrawing.asPaddingValues()
+    val initialHeaderHeight = safePadding.calculateTopPadding() + 56.dp
+    var measuredHeaderPixels by remember { mutableIntStateOf(0) }
+    val headerHeight = if (measuredHeaderPixels == 0) initialHeaderHeight else with(density) { measuredHeaderPixels.toDp() }
+    val refreshState = rememberPullToRefreshState()
     val listState = rememberLazyListState()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     DisposableEffect(lifecycle) {
@@ -89,32 +108,18 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
         onDispose { lifecycle.removeObserver(observer) }
     }
     LaunchedEffect(selection) { listState.scrollToItem(0) }
-    Scaffold(topBar = {
-        Surface(color = Color(0xFFF2F3EC)) {
-            Column(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 20.dp, vertical = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Box(Modifier.size(9.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
-                    Text("Uutishetki", fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold,
-                        style = MaterialTheme.typography.headlineMedium, letterSpacing = (-0.7).sp,
-                        color = MaterialTheme.colorScheme.primary)
-                }
-                Text("Pieni hetki maailman äärellä.", style = MaterialTheme.typography.bodyMedium)
-                Text(if (updated > 0) "Päivitetty ${formatDate(updated)}" else "Uutiset lähteistäsi, uusimmat ensin",
-                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TextButton(onClick = { filters = true }) { Text(if (active) "Suodata •" else "Suodata") }
-                    TextButton(onClick = { about = true }) { Text("Tietoa") }
-                }
-            }
-        }
-    }) { padding ->
-        PullToRefreshBox(isRefreshing = refreshing, onRefresh = { vm.refresh(true) }, modifier = Modifier.padding(padding).fillMaxSize()) {
-            LazyColumn(state = listState, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                item(key = "summary") {
-                    Text(selection.summary, style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
+    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
+        .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))) {
+        // Content padding scrolls with the list; the fixed translucent header stays above it.
+        PullToRefreshBox(isRefreshing = refreshing, onRefresh = { vm.refresh(true) },
+            state = refreshState, modifier = Modifier.fillMaxSize(), indicator = {
+                PullToRefreshDefaults.Indicator(state = refreshState, isRefreshing = refreshing,
+                    modifier = Modifier.align(Alignment.TopCenter).padding(top = headerHeight))
+            }) {
+            LazyColumn(state = listState, modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp,
+                    top = headerHeight + 8.dp, bottom = safePadding.calculateBottomPadding() + 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 if (message != null) item(key = "error") {
                     Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium) {
                         Column(Modifier.padding(16.dp)) {
@@ -144,6 +149,33 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
                 item(key = "footer") { Text("Otsikot ja sisällöt kuuluvat uutislähteille.\nKoko artikkeli avautuu julkaisijan sivulla.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             }
         }
+        Surface(modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth()
+            .onSizeChanged { measuredHeaderPixels = it.height },
+            color = Color.White.copy(alpha = 0.94f), tonalElevation = 0.dp) {
+            Column(Modifier.statusBarsPadding()) {
+                Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(horizontal = 16.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Text("Uutishetki", modifier = Modifier.weight(1f), fontFamily = brandFont,
+                        style = MaterialTheme.typography.titleLarge, color = Color.Black,
+                        maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Box {
+                        IconButton(onClick = { menu = true }, modifier = Modifier.size(48.dp)) {
+                            Icon(painterResource(R.drawable.ic_menu), contentDescription = "Avaa valikko", tint = Color.Black)
+                        }
+                        DropdownMenu(expanded = menu, onDismissRequest = { menu = false },
+                            containerColor = MaterialTheme.colorScheme.surface) {
+                            DropdownMenuItem(text = { Text("Suodattimet") }, onClick = { menu = false; filters = true })
+                            DropdownMenuItem(text = { Text("Tietoa · ${BuildConfig.VERSION_NAME}") }, onClick = { menu = false; about = true })
+                            HorizontalDivider()
+                            Text(if (updated > 0) "Päivitetty\n${formatDate(updated)}" else "Uutisia ei vielä päivitetty",
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                }
+                HorizontalDivider(thickness = 0.5.dp, color = Color(0xFF555555))
+            }
+        }
     }
     if (filters) ModalBottomSheet(onDismissRequest = { filters = false }) {
         Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -167,6 +199,7 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
         title = { Text("Uutishetki ${BuildConfig.VERSION_NAME}") },
         text = { Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text("Rauhallinen uutislukija yksityiseen käyttöön. Ei omia mainoksia, analytiikkaa tai käyttäjätilejä.")
+            Text("Nimen Roboto-kirjasin: Google, Apache License 2.0. Lisenssi sisältyy sovelluksen tiedostoihin.", style = MaterialTheme.typography.bodySmall)
             Text("Lähteet: Iltalehti, Ilta-Sanomat, Yle Uusimaa, Yle Häme (Kanta-Häme) ja Helsingin Sanomat. Kaikissa syötteissä ei ole kuvia tai kattavaa aiheluokitusta.")
             Text("Uutiset ja kuvat haetaan suoraan julkaisijoilta, jotka näkevät verkkopyynnön ja IP-osoitteen. Artikkelisivuilla voi olla mainoksia, seurantaa ja maksumuureja.")
             Text("Tallennetut otsikot ja kuvaukset toimivat ilman verkkoa. Kuvat ovat rajatussa välimuistissa, eikä niiden offline-saatavuutta taata. Sisällön oikeudet kuuluvat julkaisijoille.")
@@ -176,8 +209,8 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
 private fun NewsCard(news: News) {
     val context = LocalContext.current
     Card(onClick = { openArticle(context, news.url) }, modifier = Modifier.fillMaxWidth(),
-        border = BorderStroke(1.dp, Color(0xFFCAD1C8)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, Color(0xFFC7C7C7)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
         news.image?.let { image ->
             AsyncImage(model = image, contentDescription = null, contentScale = ContentScale.Crop,
