@@ -4,6 +4,10 @@ Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. K
 
 Uutiset näkyvät uusimmat ensin yhteisessä virrassa. Lähde- ja aihesuodattimet, lyhyet RSS-kuvaukset, syötteen kuvat ja alkuperäisten artikkelien avaaminen Custom Tabsissa / selaimessa. Ei mainos-, analytiikka- tai AI-SDK:ita, tilejä eikä palvelinta. Julkaisijoiden sivujen mainoksia, evästeitä ja maksumuureja ei muuteta.
 
+## Valmis APK
+
+[Lataa Uutishetki-0.1.0.apk](https://github.com/Tenuxi/Uutishetki/releases/download/v0.1.0/Uutishetki-0.1.0.apk) ja avaa tiedosto Androidissa. Avaimia tai GitHub-asetuksia ei tarvita asentamiseen. Paketti on testiallekirjoitettu debug-versio; tuleva eri avaimella allekirjoitettu päivitys voi vaatia vanhan version poistamisen. Katso [paketin tiedot](docs/APK-0.1.0.md). Alla oleva pysyvän avaimen ohje koskee myöhempää ylläpidettävää release-julkaisuketjua.
+
 ## Rakentaminen ja asentaminen
 
 Avaa projekti Android Studiossa tai asenna JDK 17 ja Android SDK 35 (Build Tools 35.0.0). Aseta `ANDROID_HOME` tai SDK-polku `local.properties`-tiedostoon. Gradle wrapper on mukana.

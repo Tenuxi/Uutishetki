@@ -1,0 +1,28 @@
+name: Julkaise asennettava APK
+on:
+  push:
+    tags: ['apk-*']
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Nouda tarkistettu APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh run download 41980473924 --repo "$GITHUB_REPOSITORY" --name Uutishetki-debug-ei-julkaisu --dir downloaded
+          cp downloaded/app-debug.apk Uutishetki-0.1.0.apk
+      - name: Varmenna ja julkaise APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose Uutishetki-0.1.0.apk
+          sha256sum Uutishetki-0.1.0.apk > Uutishetki-0.1.0.apk.sha256
+          gh release create v0.1.0 Uutishetki-0.1.0.apk Uutishetki-0.1.0.apk.sha256 --verify-tag --title 'Uutishetki 0.1.0' --notes-file docs/APK-0.1.0.md

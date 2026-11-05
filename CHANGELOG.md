@@ -3,6 +3,7 @@
 ## 0.1.0 – 5.11.2026
 
 ### Lisäykset
+- Käyttäjän pyynnöstä asennettavan debug-APK:n julkaisu GitHub Releasesiin ilman allekirjoitussalaisuuksien käyttöönottoa; käytetään jo tarkistettua pakettia.
 - Ensimmäinen suomenkielinen Android-versio, vaalea Compose-käyttöliittymä ja viiden lähteen yhteinen uutisvirta.
 - Kuvalliset ja kuvattomat uutiskortit, lyhyet RSS-kuvaukset, suomalaiset ajat ja alkuperäislinkit selaimeen.
 - Yhdistetyt lähde- ja aihesuodattimet alhaalta avautuvassa paneelissa.
