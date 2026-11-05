@@ -46,14 +46,32 @@ class FeedParserTest {
         val unknown = sport.copy(id = "unknown", topics = emptySet())
         val other = sport.copy(id = "other", source = Source.IS)
         val all = listOf(sport, unknown, other)
-        assertEquals(listOf(sport), all.filtered(Source.IL, Topic.SPORT))
-        assertEquals(listOf(sport, unknown), all.filtered(Source.IL, null))
-        assertEquals(all, all.filtered(null, null))
-        assertTrue(all.filtered(Source.HS, Topic.SPORT).isEmpty())
+        assertEquals(listOf(sport), all.filtered(Selection(Source.IL, setOf(Topic.SPORT))))
+        assertEquals(listOf(sport, unknown), all.filtered(Selection(Source.IL, Topic.entries.toSet())))
+        assertEquals(all, all.filtered(Selection(topics = Topic.entries.toSet())))
+        assertTrue(all.filtered(Selection(Source.HS, setOf(Topic.SPORT))).isEmpty())
     }
     @Test fun teaserIsBoundedAndEmptyIsAbsent() {
         val teaser = FeedParser.teaser("pitkä sana ".repeat(60))!!
         assertTrue(teaser.length <= 180); assertTrue(teaser.endsWith("…"))
         assertNull(FeedParser.teaser("<p> </p>"))
     }
+    @Test fun digitalMetadataAndVerifiedFeedContext() {
+        for (category in listOf("digiuutiset", "Digitoday", "Mobiili", "Tietoturva")) {
+            assertTrue(Topic.DIGITAL in FeedParser.parse(feed(item("<category>$category</category>")), Source.IS).single().topics)
+        }
+        val genericTest = feed(item("<category>Testit</category>"))
+        assertTrue(FeedParser.parse(genericTest, Source.IS).single().topics.isEmpty())
+        assertEquals(setOf(Topic.DIGITAL), FeedParser.parse(genericTest, Source.IS, Topic.DIGITAL).single().topics)
+    }
+    @Test fun generalAndDigitalFeedCopiesKeepIdentityAndTopics() {
+        val xml = feed(item("<category>Testit</category>"))
+        val general = FeedParser.parse(xml, Source.IS).single()
+        val digital = FeedParser.parse(xml, Source.IS, Topic.DIGITAL).single()
+        assertEquals(general.id, digital.id)
+        for (copies in listOf(listOf(general, digital), listOf(digital, general))) {
+            assertEquals(setOf(Topic.DIGITAL), mergeNews(copies).single().topics)
+        }
+    }
+
 }

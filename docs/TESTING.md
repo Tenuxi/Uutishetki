@@ -10,3 +10,12 @@ Tätä listaa ei ole vielä ajettu laitteella. Android 8+; lisäksi Android 15:n
 - Estä yhden lähteen verkkoyhteys: muut lähteet päivittyvät ja virheessä nimetään epäonnistunut lähde.
 - Suuri fonttikoko, TalkBack, pieni näyttö: otsikot luettavia, suodatuspaneeli vierii, painikkeet käytettävissä.
 - Asenna seuraava samalla avaimella allekirjoitettu ja suuremman versionCoden APK vanhan päälle: asennus onnistuu, paikallinen data säilyy.
+
+
+## 0.2.0:n kohdennettu laitetarkistus (ei vielä ajettu)
+
+- Ensikäynnistys: Kaikki paitsi urheilu, Digi ja luokittelemattomat mukana. Urheilu-chip lisää urheilun.
+- Valitse Digi + Talous ja IS, sulje prosessi ja avaa: valinnat palaavat. Vedä päivitys: valinnat eivät muutu.
+- Poista jokainen aihe: Ei aiheita valittu myös haun aikana. Valitse kaikki valitsee aiheet; Palauta oletukset palauttaa myös kaikki lähteet.
+- Tarkista sama Digi-artikkeli yleis- ja lisäsyötteestä: vain yksi kortti, Digi-luokka säilyy.
+- Pieni näyttö ja suuri fontti: tunnus, slogan, päivitysaika ja toimintopainikkeet luettavia. Androidin tilapalkissa tummat kuvakkeet. Kuvattoman kortin reunus erottuu.

@@ -34,3 +34,21 @@ APK ei sisällä julkaisijoiden uutisaineistoa: kukin käyttäjän laite lataa s
 | Viihde | viihde, tv & elokuvat, tv-ja-elokuvat, tv-ja-leffat, popkulttuuri, musiikki, kuninkaalliset |
 
 Kartoitus on tarkoituksella rajallinen: esimerkiksi HS:n artikkelin kategoria voi olla yksittäinen aihe, jota ei tässä listassa ole. Ulkomaan valtion nimestä ei päätellä Ulkomaat-aihetta. Kaikki-valinta näyttää myös nämä uutiset. Kuva on valinnainen, teaser on HTML:stä puhdistettu enintään 180 merkkiä ja näytössä enintään kaksi riviä. Puuttuva tai virheellinen päiväys jää tyhjäksi tietokannassa ja listan loppuun, ei muutu hakuajaksi.
+
+
+## Digi ja monivalinta — 0.2.0, tarkistus 5.11.2026
+
+| Syöte | Varmistus | Luokittelumetatiedot |
+| --- | --- | --- |
+| https://www.iltalehti.fi/rss/bitti.xml | HTTP 200, kanava Bitti, 20/20 kuvaa ja kuvausta | digiuutiset, ohjelmat, testi |
+| https://www.is.fi/rss/digitoday.xml | HTTP 200, kanava Digitoday, 100/100 kuvaa ja kuvausta | Digitoday, Mobiili, Testit, Tietoturva |
+
+Iltalehden osoite on sen aiemmin luetun virallisen [RSS-hakemiston](https://www.iltalehti.fi/rss) Bitti-linkki. IS:n Digitoday-osoite löydettiin RSS-hakemistoviitteestä ja varmistettiin suoraan julkaisijan XML-vastauksesta. Myös yleissyötteet tarkistettiin: IS:n yleissyötteessä esiintyivät Digitoday, Mobiili ja Tietoturva; IL:n lyhyessä yleissyöteikkunassa ei tällä hakukerralla ollut digiluokkia. Aihekohtaiset syötteet täydentävät kattavuutta.
+
+Digiin kuuluvat metatiedot: digiuutiset, bitti, digitoday, mobiili, tietoturva, teknologia, tietotekniikka ja ohjelmat. Lisäksi näiden kahden nimenomaisesti varmennetun digisyötteen kaikki uutiset saavat Digi-luokan: näin esimerkiksi yleinen `Testit` ei tarkoita Digiä muissa syötteissä. Tuntemattomista kategorioista ei päätellä Digiä. Ei AI:ta tai artikkelisivujen kaavintaa.
+
+Seitsemän syötettä haetaan rinnakkain. Jokainen syöte tallentuu itsenäisesti; saman lähteen sama GUID tuottaa yhden rivin, ja aiheet yhdistetään myös silloin, kun yleissyöte saapuu viimeisenä. Lisäsyötteet eivät lisää 300 uutisen lähdekohtaista tallennusrajaa. Käyttöehdot ovat samat kuin yllä kuvatuilla julkaisijoilla.
+
+Aiheiden monivalinta käyttää OR-ehtoa, lähde yhdistetään AND-ehdolla. Poikkeus: Urheilu toimii nimenomaisena poisrajauksena, kun sitä ei ole valittu, myös moniaiheiselle uutiselle. Luokittelemattomat näytetään oletuksilla (kaikki paitsi urheilu) tai kaikilla aiheilla. Tyhjä aihejoukko ei näytä mitään. Valitse kaikki koskee aiheita; Palauta oletukset palauttaa lisäksi lähteeksi Kaikki. Molemmat valinnat tallennetaan sovelluksen omiin SharedPreferences-asetuksiin, erilleen uutispäivityksen tilasta. 0.1.0:ssa ei ollut käynnistysten välillä pysyvää aihevalintaa, joten 0.2.0 ottaa ensi kertaa oletukset käyttöön.
+
+Urheiluun lisättiin havaittuja metatietoja sm-liiga, nba, maastohiihto, mestarien liiga, muutlajit, talviurheilu ja esports; viihteeseen viihdeuutiset. Kartoituksen ajantasainen kokonaisuus on `Topic.aliases`-koodissa.

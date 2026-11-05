@@ -27,7 +27,12 @@ class NewsStore(context: Context) : SQLiteOpenHelper(context, "news.db", null, 1
         val db = writableDatabase
         db.beginTransaction()
         try {
-            items.forEach { news ->
+            mergeNews(items).forEach { incoming ->
+                val previousTopics = db.rawQuery("SELECT topics FROM news WHERE id = ?", arrayOf(incoming.id)).use { cursor ->
+                    if (cursor.moveToFirst()) cursor.getString(0).split(',').mapNotNull { name -> Topic.entries.find { it.name == name } }.toSet()
+                    else emptySet()
+                }
+                val news = incoming.copy(topics = incoming.topics + previousTopics)
                 val values = ContentValues().apply {
                     put("id", news.id); put("source", news.source.name); put("title", news.title)
                     put("url", news.url); put("teaser", news.teaser); put("image", news.image)

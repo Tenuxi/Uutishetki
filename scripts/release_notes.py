@@ -22,10 +22,10 @@ notes = pathlib.Path('CHANGELOG.md').read_text()
 match = re.search(r'^## ' + re.escape(name) + r'[^\n]*\n(.*?)(?=^## |\Z)', notes, re.M | re.S)
 assert match and match.group(1).strip(), 'Version muutoskuvaus puuttuu'
 if args.tag:
-    assert args.tag == f'v{name}', 'Tagi ja versionName eivät vastaa toisiaan'
-    tags = subprocess.check_output(['git', 'tag', '--list', 'v*'], text=True).splitlines()
+    assert args.tag in (f'v{name}', f'apk-{name}'), 'Tagi ja versionName eivät vastaa toisiaan'
+    tags = subprocess.check_output(['git', 'tag', '--list'], text=True).splitlines()
     for tag in tags:
-        if tag == args.tag or not re.fullmatch(r'v\d+\.\d+\.\d+', tag):
+        if tag == args.tag or not re.fullmatch(r'(?:v|apk-)\d+\.\d+\.\d+', tag):
             continue
         previous = subprocess.check_output(['git', 'show', f'{tag}:version.properties'], text=True)
         assert code > int(properties(previous)['versionCode']), f'versionCode ei kasvanut tagista {tag}'

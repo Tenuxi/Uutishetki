@@ -59,16 +59,16 @@ class NewsRepository(app: Application, private val client: OkHttpClient) {
                 refreshing.value = true
                 message.value = null
                 val failures = supervisorScope {
-                    Source.entries.map { source -> async {
+                    feeds.map { feed -> async {
                         try {
-                            val request = Request.Builder().url(source.feed)
+                            val request = Request.Builder().url(feed.url)
                                 .header("User-Agent", "Uutishetki/${BuildConfig.VERSION_NAME} (personal RSS reader)")
                                 .header("Cache-Control", "max-age=300").build()
                             val items = client.newCall(request).execute().use { response ->
                                 if (!response.isSuccessful) throw IOException("HTTP ${response.code}")
                                 val body = response.body ?: throw IOException("Tyhjä vastaus")
                                 val bytes = body.byteStream().use { it.readBytesLimited(2 * 1024 * 1024) }
-                                FeedParser.parse(bytes.toString(Charsets.UTF_8), source)
+                                FeedParser.parse(bytes.toString(Charsets.UTF_8), feed.source, feed.topic)
                             }
                             storageMutex.withLock {
                                 store.merge(items, now)
@@ -76,10 +76,10 @@ class NewsRepository(app: Application, private val client: OkHttpClient) {
                             }
                             null
                         } catch (e: CancellationException) { throw e }
-                        catch (e: Exception) { source.label }
+                        catch (e: Exception) { feed.label }
                     } }.awaitAll().filterNotNull()
                 }
-                if (failures.size < Source.entries.size) {
+                if (failures.size < feeds.size) {
                     lastUpdated.value = now
                     prefs.edit().putLong("lastSuccess", now).apply()
                 }

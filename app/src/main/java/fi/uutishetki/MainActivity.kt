@@ -9,6 +9,11 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.SystemBarStyle
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.sp
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -43,11 +48,14 @@ import java.util.Locale
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.light(0xFFF2F3EC.toInt(), 0xFF28594E.toInt())
+        )
         setContent {
             MaterialTheme(colorScheme = lightColorScheme(
                 primary = Color(0xFF28594E), onPrimary = Color.White,
-                background = Color(0xFFF6F5F0), surface = Color(0xFFFFFEFA),
+                background = Color(0xFFE7E9E2), surface = Color(0xFFFFFEFA),
                 onBackground = Color(0xFF202C28), onSurface = Color(0xFF202C28),
                 surfaceVariant = Color(0xFFE6EAE3), onSurfaceVariant = Color(0xFF4B5852)
             )) { NewsScreen() }
@@ -66,12 +74,10 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
     val refreshing by vm.repository.refreshing.collectAsStateWithLifecycle()
     val message by vm.repository.message.collectAsStateWithLifecycle()
     val updated by vm.repository.lastUpdated.collectAsStateWithLifecycle()
-    val sourceName by vm.source.collectAsStateWithLifecycle()
-    val topicName by vm.topic.collectAsStateWithLifecycle()
-    val source = Source.entries.find { it.name == sourceName }
-    val topic = Topic.entries.find { it.name == topicName }
-    val visible = remember(news, source, topic) { news.filtered(source, topic) }
-    val active = source != null || topic != null
+    val selection by vm.selection.collectAsStateWithLifecycle()
+    val source = selection.source
+    val visible = remember(news, selection) { news.filtered(selection) }
+    val active = source != null || selection.topics != Topic.entries.toSet()
     var filters by rememberSaveable { mutableStateOf(false) }
     var about by rememberSaveable { mutableStateOf(false) }
     val listState = rememberLazyListState()
@@ -82,21 +88,32 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
         if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) vm.refresh()
         onDispose { lifecycle.removeObserver(observer) }
     }
-    LaunchedEffect(source, topic) { listState.scrollToItem(0) }
+    LaunchedEffect(selection) { listState.scrollToItem(0) }
     Scaffold(topBar = {
-        TopAppBar(title = { Text("Uutishetki", fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold) },
-            actions = {
-                TextButton(onClick = { filters = true }) { Text(if (active) "Suodata •" else "Suodata") }
-                TextButton(onClick = { about = true }) { Text("Tietoa") }
-            }, colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background))
+        Surface(color = Color(0xFFF2F3EC)) {
+            Column(Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 20.dp, vertical = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Box(Modifier.size(9.dp).background(MaterialTheme.colorScheme.primary, CircleShape))
+                    Text("Uutishetki", fontFamily = FontFamily.Serif, fontWeight = FontWeight.Bold,
+                        style = MaterialTheme.typography.headlineMedium, letterSpacing = (-0.7).sp,
+                        color = MaterialTheme.colorScheme.primary)
+                }
+                Text("Pieni hetki maailman äärellä.", style = MaterialTheme.typography.bodyMedium)
+                Text(if (updated > 0) "Päivitetty ${formatDate(updated)}" else "Uutiset lähteistäsi, uusimmat ensin",
+                    style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    TextButton(onClick = { filters = true }) { Text(if (active) "Suodata •" else "Suodata") }
+                    TextButton(onClick = { about = true }) { Text("Tietoa") }
+                }
+            }
+        }
     }) { padding ->
         PullToRefreshBox(isRefreshing = refreshing, onRefresh = { vm.refresh(true) }, modifier = Modifier.padding(padding).fillMaxSize()) {
             LazyColumn(state = listState, modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 item(key = "summary") {
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(if (active) listOfNotNull(source?.label, topic?.label).joinToString(" · ") else "Pieni hetki maailman äärellä.", style = MaterialTheme.typography.titleMedium)
-                        Text(if (updated > 0) "Päivitetty ${formatDate(updated)}" else "Uutiset lähteistäsi, uusimmat ensin", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
+                    Text(selection.summary, style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 if (message != null) item(key = "error") {
                     Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium) {
@@ -108,13 +125,17 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
                 }
                 if (visible.isEmpty()) item(key = "empty") {
                     Column(Modifier.fillMaxWidth().padding(vertical = 48.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        if (loading || refreshing) {
+                        if (selection.topics.isEmpty()) {
+                            Text("Ei aiheita valittu", style = MaterialTheme.typography.titleMedium)
+                            Text("Valitse vähintään yksi aihe Suodata-paneelista.")
+                            TextButton(onClick = { filters = true }) { Text("Valitse aiheet") }
+                        } else if (loading || refreshing) {
                             CircularProgressIndicator()
                             Text("Haetaan uutisia…")
                         } else {
                             Text(if (active) "Näillä valinnoilla ei löytynyt uutisia." else "Ei vielä tallennettuja uutisia.", style = MaterialTheme.typography.titleMedium)
                             Text(if (active) "Kokeile toista aihetta tai lähdettä." else "Yhdistä verkkoon ja päivitä uutisvirta.")
-                            if (active) TextButton(onClick = vm::clear) { Text("Tyhjennä valinnat") }
+                            if (active) TextButton(onClick = vm::defaults) { Text("Palauta oletukset") }
                             else TextButton(onClick = { vm.refresh(true) }) { Text("Päivitä") }
                         }
                     }
@@ -132,12 +153,13 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
                 FilterChip(selected = source == null, onClick = { vm.source(null) }, label = { Text("Kaikki") })
                 Source.entries.forEach { item -> FilterChip(selected = source == item, onClick = { vm.source(item) }, label = { Text(item.label) }) }
             }
-            Text("Aihe", style = MaterialTheme.typography.titleMedium)
+            Text("Aiheet", style = MaterialTheme.typography.titleMedium)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(selected = topic == null, onClick = { vm.topic(null) }, label = { Text("Kaikki") })
-                Topic.entries.forEach { item -> FilterChip(selected = topic == item, onClick = { vm.topic(item) }, label = { Text(item.label) }) }
+                Topic.entries.forEach { item -> FilterChip(selected = item in selection.topics, onClick = { vm.toggle(item) }, label = { Text(item.label) }) }
             }
-            TextButton(onClick = vm::clear) { Text("Tyhjennä valinnat") }
+            Text("Luokittelemattomat näkyvät oletuksilla ja kaikkien aiheiden valinnalla.", style = MaterialTheme.typography.bodySmall)
+            TextButton(onClick = vm::allTopics) { Text("Valitse kaikki") }
+            TextButton(onClick = vm::defaults) { Text("Palauta oletukset") }
             Button(onClick = { filters = false }, modifier = Modifier.fillMaxWidth()) { Text("Näytä uutiset") }
         }
     }
@@ -154,6 +176,8 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
 private fun NewsCard(news: News) {
     val context = LocalContext.current
     Card(onClick = { openArticle(context, news.url) }, modifier = Modifier.fillMaxWidth(),
+        border = BorderStroke(1.dp, Color(0xFFCAD1C8)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
         news.image?.let { image ->
             AsyncImage(model = image, contentDescription = null, contentScale = ContentScale.Crop,

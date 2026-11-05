@@ -2,27 +2,43 @@ name: Julkaise asennettava APK
 on:
   push:
     tags: ['apk-*']
-  workflow_dispatch:
 permissions:
   actions: read
   contents: write
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
   publish:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
-      - name: Nouda tarkistettu APK
+        with:
+          fetch-depth: 0
+      - name: Tarkista versio ja nouda saman commitin hyväksytty APK
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh run download 41980473924 --repo "$GITHUB_REPOSITORY" --name Uutishetki-debug-ei-julkaisu --dir downloaded
-          cp downloaded/app-debug.apk Uutishetki-0.1.0.apk
-      - name: Varmenna ja julkaise APK
+          python3 scripts/release_notes.py --tag "$GITHUB_REF_NAME" --output release-notes.md
+          run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow android.yml --commit "$GITHUB_SHA" --branch main --status success --json databaseId --jq '.[0].databaseId')
+          if [ -z "$run_id" ] || [ "$run_id" = null ]; then
+            echo '::error::Tälle commitille ei ole onnistunutta main-haaran Android-tarkistusta. Odota tarkistus ja aja tämä työ uudelleen.'
+            exit 1
+          fi
+          gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name Uutishetki-debug-ei-julkaisu --dir downloaded
+          version="${GITHUB_REF_NAME#apk-}"
+          cp downloaded/app-debug.apk "Uutishetki-$version.apk"
+      - name: Varmenna paketti ja julkaise
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose Uutishetki-0.1.0.apk
-          sha256sum Uutishetki-0.1.0.apk > Uutishetki-0.1.0.apk.sha256
-          gh release create v0.1.0 Uutishetki-0.1.0.apk Uutishetki-0.1.0.apk.sha256 --verify-tag --title 'Uutishetki 0.1.0' --notes-file docs/APK-0.1.0.md
+          version="${GITHUB_REF_NAME#apk-}"
+          apk="Uutishetki-$version.apk"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" > apk-metadata.txt
+          python3 scripts/verify_apk.py apk-metadata.txt
+          sha256sum "$apk" > "$apk.sha256"
+          printf '\nAsennettava APK on testiallekirjoitettu debug-versio, kuten 0.1.0. Eri allekirjoituksen vuoksi aiempi sovellus voi vaatia poistamisen ennen asennusta; poistaminen hävittää paikallisen datan ja valinnat. Tavallinen saman avaimen päivitys ja uutisten päivitys säilyttävät valinnat. Laitetestausta ei ole tehty.\n' >> release-notes.md
+          gh release create "$GITHUB_REF_NAME" "$apk" "$apk.sha256" --verify-tag --title "Uutishetki $version" --notes-file release-notes.md

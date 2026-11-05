@@ -1,12 +1,12 @@
 # Uutishetki
 
-Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.1.0**, versionCode **1**.
+Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.2.0**, versionCode **2**.
 
-Uutiset näkyvät uusimmat ensin yhteisessä virrassa. Lähde- ja aihesuodattimet, lyhyet RSS-kuvaukset, syötteen kuvat ja alkuperäisten artikkelien avaaminen Custom Tabsissa / selaimessa. Ei mainos-, analytiikka- tai AI-SDK:ita, tilejä eikä palvelinta. Julkaisijoiden sivujen mainoksia, evästeitä ja maksumuureja ei muuteta.
+Uutiset näkyvät uusimmat ensin yhteisessä virrassa. Lähdesuodatin ja pysyvä aiheiden monivalinta (oletuksena kaikki paitsi Urheilu), lyhyet RSS-kuvaukset, syötteen kuvat ja alkuperäisten artikkelien avaaminen Custom Tabsissa / selaimessa. Ei mainos-, analytiikka- tai AI-SDK:ita, tilejä eikä palvelinta. Julkaisijoiden sivujen mainoksia, evästeitä ja maksumuureja ei muuteta.
 
 ## Valmis APK
 
-[Lataa Uutishetki-0.1.0.apk](https://github.com/Tenuxi/Uutishetki/releases/download/v0.1.0/Uutishetki-0.1.0.apk) ja avaa tiedosto Androidissa. Avaimia tai GitHub-asetuksia ei tarvita asentamiseen. Paketti on testiallekirjoitettu debug-versio; tuleva eri avaimella allekirjoitettu päivitys voi vaatia vanhan version poistamisen. Katso [paketin tiedot](docs/APK-0.1.0.md). Alla oleva pysyvän avaimen ohje koskee myöhempää ylläpidettävää release-julkaisuketjua.
+[Lataa uusin APK](https://github.com/Tenuxi/Uutishetki/releases/latest) ja avaa tiedosto Androidissa. Avaimia tai GitHub-asetuksia ei tarvita asentamiseen. Paketti on testiallekirjoitettu debug-versio; tuleva eri avaimella allekirjoitettu päivitys voi vaatia vanhan version poistamisen. Versio 0.2.0 lisää Digi-syötteet, pysyvät monivalinnat ja erottuvamman ulkoasun. Alla oleva pysyvän avaimen ohje koskee myöhempää ylläpidettävää release-julkaisuketjua.
 
 ## Rakentaminen ja asentaminen
 
@@ -81,3 +81,10 @@ Syötteet ja kuvat haetaan suoraan julkaisijoilta; ne saavat normaalit verkkopyy
 ## Tarkistukset
 
 JUnit testaa RSS-kentät, kuvat, HTML-siivouksen, päivämäärät, tunnisteet, URL-rajoituksen ja yhdistetyt suodattimet. GitHub Actions ajaa testit, Android Lintin ja APK-käännöksen. [Manuaalinen tarkistuslista](docs/TESTING.md) kattaa laitteen käyttötilanteet. Emulaattoria ei käynnistetä oletuksena. Katso version toteutunut tarkistustilanne muutoslokista; koodin valmistuminen ei tarkoita, että laitetestaus tai allekirjoitettu julkaisu olisi tehty.
+
+
+## Nykyisen testiallekirjoitetun APK:n julkaisu (0.2.0 alkaen)
+
+Päivitä versio ja versionCode sekä muutosloki, commit ja push main-haaraan. Odota saman commitin Android-työn onnistumista. Tee sitten `git tag -a apk-0.2.0 -m 'Uutishetki 0.2.0'` ja `git push origin apk-0.2.0`. `Julkaise asennettava APK` noutaa juuri kyseisen commitin tarkistetun debug-APK:n, varmentaa tunnisteen/version/allekirjoituksen ja julkaisee sen Releasesiin. Se ei käytä vanhaa kovakoodattua buildia eikä aja testejä uudelleen. Jos main-tarkistus ei vielä ole onnistunut, julkaisu pysähtyy; käynnistä epäonnistunut julkaisu-job uudelleen tarkistuksen valmistuttua.
+
+Tämä on aiemmin valittu ilman Secrets-asetuksia toimiva jakelutapa. `v*`-tagien pysyvän avaimen release-polku on edelleen tarjolla yllä olevien ohjeiden mukaan. Älä julkaise samaa versiota molemmilla tavoilla. Android ei hyväksy eri avaimella allekirjoitettua APK:ta aiemman päälle. Poistaminen nollaa asetukset, mutta normaali saman avaimen päivitys, uudelleenkäynnistys tai uutisten päivitys ei nollaa 0.2.0:n valintoja.

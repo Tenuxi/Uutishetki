@@ -20,22 +20,61 @@ enum class Topic(val label: String, val aliases: Set<String>) {
     DOMESTIC("Kotimaa", setOf("kotimaa", "politiikka", "kaupunki")),
     WORLD("Ulkomaat", setOf("ulkomaat")),
     ECONOMY("Talous", setOf("talous", "taloussanomat", "raha", "pörssi", "sijoittaminen")),
-    SPORT("Urheilu", setOf("urheilu", "jääkiekko", "jalkapallo", "formula 1", "f1", "hiihto", "ralli", "yleisurheilu", "koripallo", "tennis", "salibandy", "pesäpallo", "jaakiekko", "nhl", "smliiga", "formulat")),
-    ENTERTAINMENT("Viihde", setOf("viihde", "tv & elokuvat", "tv-ja-elokuvat", "popkulttuuri", "musiikki", "kuninkaalliset", "tv-ja-leffat"))
+    SPORT("Urheilu", setOf("urheilu", "jääkiekko", "jalkapallo", "formula 1", "f1", "hiihto", "ralli", "yleisurheilu", "koripallo", "tennis", "salibandy", "pesäpallo", "jaakiekko", "nhl", "smliiga", "formulat", "sm-liiga", "nba", "maastohiihto", "mestarien liiga", "muutlajit", "talviurheilu", "esports")),
+    ENTERTAINMENT("Viihde", setOf("viihde", "tv & elokuvat", "tv-ja-elokuvat", "popkulttuuri", "musiikki", "kuninkaalliset", "tv-ja-leffat", "viihdeuutiset")),
+    DIGITAL("Digi", setOf("digiuutiset", "bitti", "digitoday", "mobiili", "tietoturva", "teknologia", "tietotekniikka", "ohjelmat"))
 }
 data class News(
     val id: String, val source: Source, val title: String, val url: String,
     val teaser: String?, val image: String?, val published: Long?, val topics: Set<Topic>
 )
-fun List<News>.filtered(source: Source?, topic: Topic?) = filter {
-    (source == null || it.source == source) && (topic == null || topic in it.topics)
+data class Feed(val source: Source, val url: String, val topic: Topic? = null) {
+    val label get() = source.label + if (topic == null) "" else " · ${topic.label}"
+}
+val feeds = Source.entries.map { Feed(it, it.feed) } + listOf(
+    Feed(Source.IL, "https://www.iltalehti.fi/rss/bitti.xml", Topic.DIGITAL),
+    Feed(Source.IS, "https://www.is.fi/rss/digitoday.xml", Topic.DIGITAL)
+)
+val defaultTopics = Topic.entries.toSet() - Topic.SPORT
+
+data class Selection(val source: Source? = null, val topics: Set<Topic> = defaultTopics) {
+    fun toggle(topic: Topic) = copy(topics = if (topic in topics) topics - topic else topics + topic)
+    val summary: String get() {
+        val subjects = when (topics) {
+            defaultTopics -> "Kaikki paitsi urheilu"
+            Topic.entries.toSet() -> "Kaikki aiheet"
+            emptySet<Topic>() -> "Ei aiheita valittu"
+            else -> Topic.entries.filter { it in topics }.joinToString(", ") { it.label }
+        }
+        return listOfNotNull(source?.label, subjects).joinToString(" · ")
+    }
+}
+object SelectionCodec {
+    fun encode(value: Selection) = (value.source?.name ?: "") + "|" +
+        Topic.entries.filter { it in value.topics }.joinToString(",") { it.name }
+    fun decode(value: String?): Selection {
+        if (value == null || '|' !in value) return Selection()
+        val (source, topics) = value.split('|', limit = 2)
+        return Selection(Source.entries.find { it.name == source },
+            topics.split(',').mapNotNull { name -> Topic.entries.find { it.name == name } }.toSet())
+    }
+}
+fun List<News>.filtered(selection: Selection) = filter { news ->
+    (selection.source == null || news.source == selection.source) &&
+        selection.topics.isNotEmpty() &&
+        (Topic.SPORT in selection.topics || Topic.SPORT !in news.topics) &&
+        (news.topics.any { it in selection.topics } ||
+            (news.topics.isEmpty() && selection.topics.containsAll(defaultTopics)))
+}
+fun mergeNews(items: List<News>) = items.groupBy { it.id }.values.map { copies ->
+    copies.first().copy(topics = copies.flatMap { it.topics }.toSet())
 }
 fun httpsUrl(value: String): String? = runCatching {
     URI(value.trim()).takeIf { it.scheme == "https" && !it.host.isNullOrBlank() && it.userInfo == null }?.toString()
 }.getOrNull()
 
 object FeedParser {
-    fun parse(xml: String, source: Source): List<News> {
+    fun parse(xml: String, source: Source, feedTopic: Topic? = null): List<News> {
         // XML mode never resolves external entities; only feed fields are read, never article pages.
         val doc = Jsoup.parse(xml, "", Parser.xmlParser())
         require(doc.selectFirst("rss > channel") != null) { "Vastaus ei ole RSS-syöte" }
@@ -47,7 +86,7 @@ object FeedParser {
             val id = source.name + ":" + MessageDigest.getInstance("SHA-256")
                 .digest(key.toByteArray()).joinToString("") { "%02x".format(it) }
             val categories = item.children().filter { it.tagName() == "category" }.map { plain(it.text()).lowercase(Locale.ROOT) }
-            val topics = Topic.entries.filter { topic -> categories.any { it in topic.aliases } }.toSet()
+            val topics = Topic.entries.filter { topic -> categories.any { it in topic.aliases } }.toSet() + listOfNotNull(feedTopic)
             val image = item.children().firstNotNullOfOrNull { el ->
                 if ((el.tagName() == "enclosure" && el.attr("type").startsWith("image/")) ||
                     (el.tagName() in setOf("media:content", "media:thumbnail") &&
