@@ -20,11 +20,11 @@
 - Lint: 0 virhettä ja 10 varoitusta (uudempia riippuvuus-/SDK-versioita, Android 12:n dataExtractionRules ja KTX-tyylisuositukset). Tarkistuksia ei poistettu tai vaiennettu.
 - [Ladattava debug-testiversio](https://github.com/Tenuxi/Uutishetki/actions/runs/41977184639/artifacts/13392685128), ei pysyvällä julkaisuavaimella allekirjoitettu release.
 - Paikallista Android-käännöstä ei ajettu: ympäristössä ei ole JDK:ta tai Android SDK:ta.
-- Ei emulaattori- tai fyysisen laitteen testiä. Allekirjoitettua APK-julkaisua ei vielä varmistettu.
+- Ei emulaattori- tai fyysisen laitteen testiä. Testiallekirjoitetun APK:n julkaisu ja allekirjoitus varmennettu [julkaisuajossa 41981111738](https://github.com/Tenuxi/Uutishetki/actions/runs/41981111738). [Lataa APK](https://github.com/Tenuxi/Uutishetki/releases/download/v0.1.0/Uutishetki-0.1.0.apk).
 
 ### Tiedossa olevat puutteet
 - Ylen alueuutisissa ei havaittu kuvia; Yle Häme tarkoittaa Kanta-Hämettä.
 - Syötteiden rajalliset uutisikkunat ja epätäydellinen kategoriakartoitus; luokittelemattomat näkyvät Kaikki-näkymässä.
 - Sanoman RSS-erityisehtojen sivut palauttivat 403; erityisehtoja ei voitu varmistaa. Käyttö rajattu yksityiseen RSS-lukemiseen, ei julkista sisältöpalvelua.
 - Offline-kuvien saatavuutta ei taata. Kokonaisten artikkelien offline-lukua ei ole.
-- Pysyvä julkaisuavain ja neljä GitHub Secrets -arvoa on otettava käyttöön README:n mukaan ennen ensimmäistä julkaisutagia.
+- Nykyinen ladattava APK käyttää testiallekirjoitusta. Pysyvään release-avaimeen siirtyminen voi vaatia sovelluksen poistamisen; pysyvän julkaisuavaimen käyttöönotto on erillinen jatkotoimi.
