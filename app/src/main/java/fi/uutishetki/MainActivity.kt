@@ -44,6 +44,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -76,7 +77,7 @@ class MainActivity : ComponentActivity() {
 private val brandFont = FontFamily(Font(R.font.roboto_regular))
 private val finnishDate = DateTimeFormatter.ofPattern("d.M.yyyy 'klo' HH.mm", Locale.forLanguageTag("fi-FI"))
     .withZone(ZoneId.of("Europe/Helsinki"))
-private fun formatDate(millis: Long) = finnishDate.format(Instant.ofEpochMilli(millis))
+internal fun formatDate(millis: Long) = finnishDate.format(Instant.ofEpochMilli(millis))
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
@@ -90,9 +91,10 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
     val source = selection.source
     val visible = remember(news, selection) { news.filtered(selection) }
     val active = source != null || selection.topics != Topic.entries.toSet()
-    var filters by rememberSaveable { mutableStateOf(false) }
     var about by rememberSaveable { mutableStateOf(false) }
-    var menu by rememberSaveable { mutableStateOf(false) }
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
+    val openDrawer: () -> Unit = { scope.launch { drawerState.open() } }
     val density = LocalDensity.current
     val safePadding = WindowInsets.safeDrawing.asPaddingValues()
     val initialHeaderHeight = safePadding.calculateTopPadding() + 56.dp
@@ -108,6 +110,9 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
         onDispose { lifecycle.removeObserver(observer) }
     }
     LaunchedEffect(selection) { listState.scrollToItem(0) }
+    RightFilterDrawer(drawerState = drawerState, selection = selection, updated = updated,
+        onSource = vm::source, onTopic = vm::toggle, onAllTopics = vm::allTopics,
+        onDefaults = vm::defaults, onAbout = { scope.launch { drawerState.close(); about = true } }) {
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
         .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))) {
         // Content padding scrolls with the list; the fixed translucent header stays above it.
@@ -132,8 +137,8 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
                     Column(Modifier.fillMaxWidth().padding(vertical = 48.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         if (selection.topics.isEmpty()) {
                             Text("Ei aiheita valittu", style = MaterialTheme.typography.titleMedium)
-                            Text("Valitse vähintään yksi aihe Suodata-paneelista.")
-                            TextButton(onClick = { filters = true }) { Text("Valitse aiheet") }
+                            Text("Valitse vähintään yksi aihe valikosta.")
+                            TextButton(onClick = openDrawer) { Text("Valitse aiheet") }
                         } else if (loading || refreshing) {
                             CircularProgressIndicator()
                             Text("Haetaan uutisia…")
@@ -158,42 +163,14 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
                     Text("Uutishetki", modifier = Modifier.weight(1f), fontFamily = brandFont,
                         style = MaterialTheme.typography.titleLarge, color = Color.Black,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Box {
-                        IconButton(onClick = { menu = true }, modifier = Modifier.size(48.dp)) {
-                            Icon(painterResource(R.drawable.ic_menu), contentDescription = "Avaa valikko", tint = Color.Black)
-                        }
-                        DropdownMenu(expanded = menu, onDismissRequest = { menu = false },
-                            containerColor = MaterialTheme.colorScheme.surface) {
-                            DropdownMenuItem(text = { Text("Suodattimet") }, onClick = { menu = false; filters = true })
-                            DropdownMenuItem(text = { Text("Tietoa · ${BuildConfig.VERSION_NAME}") }, onClick = { menu = false; about = true })
-                            HorizontalDivider()
-                            Text(if (updated > 0) "Päivitetty\n${formatDate(updated)}" else "Uutisia ei vielä päivitetty",
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
+                    IconButton(onClick = openDrawer, modifier = Modifier.size(48.dp)) {
+                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "Avaa valikko", tint = Color.Black)
                     }
                 }
                 HorizontalDivider(thickness = 0.5.dp, color = Color(0xFF555555))
             }
         }
     }
-    if (filters) ModalBottomSheet(onDismissRequest = { filters = false }) {
-        Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp).padding(bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Suodata uutisia", style = MaterialTheme.typography.headlineSmall)
-            Text("Lähde", style = MaterialTheme.typography.titleMedium)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                FilterChip(selected = source == null, onClick = { vm.source(null) }, label = { Text("Kaikki") })
-                Source.entries.forEach { item -> FilterChip(selected = source == item, onClick = { vm.source(item) }, label = { Text(item.label) }) }
-            }
-            Text("Aiheet", style = MaterialTheme.typography.titleMedium)
-            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Topic.entries.forEach { item -> FilterChip(selected = item in selection.topics, onClick = { vm.toggle(item) }, label = { Text(item.label) }) }
-            }
-            Text("Luokittelemattomat näkyvät oletuksilla ja kaikkien aiheiden valinnalla.", style = MaterialTheme.typography.bodySmall)
-            TextButton(onClick = vm::allTopics) { Text("Valitse kaikki") }
-            TextButton(onClick = vm::defaults) { Text("Palauta oletukset") }
-            Button(onClick = { filters = false }, modifier = Modifier.fillMaxWidth()) { Text("Näytä uutiset") }
-        }
     }
     if (about) AlertDialog(onDismissRequest = { about = false }, confirmButton = { TextButton(onClick = { about = false }) { Text("Sulje") } },
         title = { Text("Uutishetki ${BuildConfig.VERSION_NAME}") },

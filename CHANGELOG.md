@@ -1,5 +1,24 @@
 # Muutosloki
 
+## 0.2.2 – 5.11.2026
+
+### Muutokset
+- Hampurilaisvalikko avaa oikealta liukuvan valkoisen sivupaneelin pudotusvalikon ja erillisen suodatusnäkymän sijaan. Uutisnäkymä himmenee paneelin taustalla.
+- Lehdet valitaan leveistä painikkeista ja aiheet pyöristetyistä monivalintapainikkeista. Valittu vaihtoehto erottuu siniharmaasta taustasta ja valintamerkistä.
+- Valinnat päivittävät listaa heti sulkematta paneelia. Nykyinen lähdevalinta, monivalinta ja käynnistysten välillä säilyvät asetukset ovat ennallaan.
+- Valitse kaikki ja Palauta oletukset ovat suoraan paneelissa. Tietoa, versionumero ja päivitysaika ovat vieritettävän sisällön alaosassa.
+- Paneeli sulkeutuu sulkemiskuvakkeella, taustan napautuksella, paluutoiminnolla tai pyyhkäisyllä. Kiinteä sulkemispainike, turva-alueet, vähintään 48 dp kosketusalueet, vieritys ja rivittyvät tekstit huomioitu.
+- Muu uutisnäkymä, uutislähteet, suodatuslogiikka ja applicationId eivät muutu.
+
+### Tarkistukset
+- Koodista tarkistettu paneelin avaus ja sulkemisreitit, heti vaikuttavat valinnat ilman sulkemista, nykyisen ViewModelin tallennuskutsut sekä footerin pysyminen samassa vieritettävässä sisällössä.
+- Käytetyt drawer-API:t tarkistettu käytössä olevan Material 3 -version lähdekoodista. XML-resurssit ja muutoskuvauksen rakenne tarkistettu paikallisesti.
+- GitHub Actions ajaa nykyiset 15 testiä, lintin ja APK-käännöksen; ei uusia ulkoasuyksikkötestejä tai paikallista Android-buildia.
+- Ei emulaattori- tai laitetestiä. Paneelin animaatio, kosketukset, TalkBack, suuri fonttikoko ja pieni näyttö jäävät laitteella varmistettaviksi.
+
+### Rajoitteet
+- APK julkaistaan nykyisellä testiallekirjoituspolulla. Eri avaimen vuoksi aiempi asennus voi vaatia poistamisen, mikä poistaa paikalliset tiedot ja valinnat. Sovelluksen valintojen tallennuslogiikka säilyy ennallaan.
+
 ## 0.2.1 – 5.11.2026
 
 ### Muutokset

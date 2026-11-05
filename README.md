@@ -1,6 +1,6 @@
 # Uutishetki
 
-Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.2.1**, versionCode **3**.
+Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.2.2**, versionCode **4**.
 
 Uutiset näkyvät uusimmat ensin yhteisessä virrassa. Lähdesuodatin ja pysyvä aiheiden monivalinta (oletuksena kaikki paitsi Urheilu), lyhyet RSS-kuvaukset, syötteen kuvat ja alkuperäisten artikkelien avaaminen Custom Tabsissa / selaimessa. Ei mainos-, analytiikka- tai AI-SDK:ita, tilejä eikä palvelinta. Julkaisijoiden sivujen mainoksia, evästeitä ja maksumuureja ei muuteta.
 
@@ -97,3 +97,8 @@ Kiinteän, läpikuultavan Roboto-yläpalkin hampurilaisvalikko avaa suodattimet 
 Roboto Regular on ladattu [Google Fontsin Roboto-lähdereposta](https://github.com/googlefonts/roboto-2/blob/main/src/hinted/Roboto-Regular.ttf), lisenssi [Apache 2.0](docs/Roboto-LICENSE.txt); lisenssi on mukana myös APK:n assets/licenses-hakemistossa. Nimen kirjasin ei riipu puhelinvalmistajan oletusfontista.
 
 Vanhan 0.2.0-version allekirjoitusavain puuttuu. Version 0.2.1 julkaisu tehdään käyttäjän erikseen hyväksymänä uutena asennuksena; vanhan version poistaminen hävittää paikalliset uutiset ja valinnat.
+
+
+## Sivupaneeli 0.2.2
+
+Hampurilainen avaa oikealta liukuvan paneelin, jossa Lehdet ja Aiheet ovat suoraan valittavissa. Suodatus päivittyy sulkematta paneelia ja nykyinen valintojen tallennus säilyy. Paneelissa ovat myös Valitse kaikki, Palauta oletukset, Tietoa, versionumero ja päivitysaika. Sulje X:stä, himmennetystä taustasta tai Androidin paluutoiminnolla. Koko valintasisältö alaosan tietoineen vierii pienillä näytöillä.
