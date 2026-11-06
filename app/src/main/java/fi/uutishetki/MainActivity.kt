@@ -1,6 +1,14 @@
 package fi.uutishetki
 
+import android.Manifest
 import android.content.ActivityNotFoundException
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.collectLatest
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -81,7 +89,16 @@ internal fun formatDate(millis: Long) = finnishDate.format(Instant.ofEpochMilli(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun NewsScreen(vm: NewsViewModel = viewModel()) {
+fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = viewModel()) {
+    val weatherSettings by weather.settings.collectAsStateWithLifecycle()
+    val weatherState by weather.state.collectAsStateWithLifecycle()
+    var weatherDetails by rememberSaveable { mutableStateOf(false) }
+    val permission = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) weather.automatic() else weather.permissionDenied()
+    }
+    val automaticWeather: () -> Unit = {
+        if (weather.hasLocationPermission()) weather.automatic() else permission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+    }
     val news by vm.repository.news.collectAsStateWithLifecycle()
     val loading by vm.repository.loading.collectAsStateWithLifecycle()
     val refreshing by vm.repository.refreshing.collectAsStateWithLifecycle()
@@ -109,8 +126,15 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
         if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) vm.refresh()
         onDispose { lifecycle.removeObserver(observer) }
     }
+    LaunchedEffect(lifecycle, weather) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            combine(weather.settings, weather.refreshToken) { settings, token -> settings to token }.collectLatest {
+                while (isActive) { weather.refresh(); delay(60_000) }
+            }
+        }
+    }
     LaunchedEffect(selection) { listState.scrollToItem(0) }
-    RightFilterDrawer(drawerState = drawerState, selection = selection, updated = updated,
+    RightFilterDrawer(weather = weather, onAutomaticWeather = automaticWeather, drawerState = drawerState, selection = selection, updated = updated,
         onSource = vm::source, onTopic = vm::toggle, onAllTopics = vm::allTopics,
         onDefaults = vm::defaults, onAbout = { scope.launch { drawerState.close(); about = true } }) {
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
@@ -163,6 +187,7 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
                     Text("Uutishetki", modifier = Modifier.weight(1f), fontFamily = brandFont,
                         style = MaterialTheme.typography.titleLarge, color = Color.Black,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (weatherSettings.enabled) WeatherButton(weatherState) { weatherDetails = true }
                     IconButton(onClick = openDrawer, modifier = Modifier.size(48.dp)) {
                         Icon(painterResource(R.drawable.ic_menu), contentDescription = "Avaa valikko", tint = Color.Black)
                     }
@@ -172,6 +197,8 @@ fun NewsScreen(vm: NewsViewModel = viewModel()) {
         }
     }
     }
+    if (weatherDetails) WeatherDetails(weatherState, weatherSettings.automatic,
+        onSettings = { weatherDetails = false; openDrawer() }, onDismiss = { weatherDetails = false })
     if (about) AlertDialog(onDismissRequest = { about = false }, confirmButton = { TextButton(onClick = { about = false }) { Text("Sulje") } },
         title = { Text("Uutishetki ${BuildConfig.VERSION_NAME}") },
         text = { Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -201,7 +228,7 @@ private fun NewsCard(news: News) {
         }
     }
 }
-private fun openArticle(context: Context, url: String) {
+internal fun openArticle(context: Context, url: String) {
     val uri = Uri.parse(url)
     try { CustomTabsIntent.Builder().setShowTitle(true).build().launchUrl(context, uri) }
     catch (_: ActivityNotFoundException) {

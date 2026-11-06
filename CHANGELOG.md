@@ -1,5 +1,15 @@
 # Muutosloki
 
+## 0.3.0 – 6.11.2026
+
+- Vapaaehtoinen paikallinen sää yläpalkkiin: sääkuvake, lämpötila ja napautettavat lisätiedot lähdemerkintöineen.
+- Sivupaneelissa sään päälle/pois-valinta, automaattinen likimääräinen sijainti ja paikkakunnan haku käsin. Asetukset säilyvät käynnistysten välillä.
+- Sijaintilupa pyydetään vain käyttäjän valinnasta. Ei taustapaikannusta tai sijaintihistoriaa. Sää haetaan uutisista riippumatta 15 minuutin välein; vanhentunut tai epäonnistunut tieto ei näytä ajantasaiselta.
+- Open-Meteon maksuton ei-kaupallinen säärajapinta ja GeoNames-paikkakuntahaku. Lähteet, käyttöehdot, päivitysvälit ja rajoitteet: [selvitys](docs/WEATHER_AND_ALERTS.md).
+- Hälytysintegraatio jäi toteuttamatta: sopivaa avointa rajapintaa, uudelleenjulkaisuoikeutta ja riittävän tarkkoja tapahtumapaikkoja ei voitu varmistaa. Paneelissa tieto esteestä ja linkki Tilannehuone.fi:hin; ei keksittyjä hälytyksiä.
+- Seitsemän kohdennettua säälogiikan testiä. Ei paikallista Android-buildia tai emulaattoria. Laitteen lupadialogi, paikannus, kosketukset ja suuret tekstikoot jäävät laitteella tarkistettaviksi. Actions-tulos lisätään julkaisun jälkeen.
+- ApplicationId ja nykyinen julkaisutyönkulku säilyvät. Testiallekirjoituksen vaihtuminen voi edellyttää aiemman asennuksen poistamista ja poistaa sen paikalliset tiedot.
+
 ## 0.2.2 – 5.11.2026
 
 ### Muutokset

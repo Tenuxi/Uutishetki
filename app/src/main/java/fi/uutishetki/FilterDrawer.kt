@@ -22,6 +22,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun RightFilterDrawer(
+    weather: WeatherViewModel,
+    onAutomaticWeather: () -> Unit,
     drawerState: DrawerState,
     selection: Selection,
     updated: Long,
@@ -94,6 +96,7 @@ fun RightFilterDrawer(
                                         Text("Palauta oletukset")
                                     }
                                 }
+                                item { WeatherSettingsContent(weather, onAutomaticWeather) }
                                 // Footer shares the scroll container so it cannot overlap the choices.
                                 item {
                                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

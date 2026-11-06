@@ -1,6 +1,6 @@
 # Uutishetki
 
-Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.2.2**, versionCode **4**.
+Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.3.0**, versionCode **5**.
 
 Uutiset näkyvät uusimmat ensin yhteisessä virrassa. Lähdesuodatin ja pysyvä aiheiden monivalinta (oletuksena kaikki paitsi Urheilu), lyhyet RSS-kuvaukset, syötteen kuvat ja alkuperäisten artikkelien avaaminen Custom Tabsissa / selaimessa. Ei mainos-, analytiikka- tai AI-SDK:ita, tilejä eikä palvelinta. Julkaisijoiden sivujen mainoksia, evästeitä ja maksumuureja ei muuteta.
 
@@ -102,3 +102,7 @@ Vanhan 0.2.0-version allekirjoitusavain puuttuu. Version 0.2.1 julkaisu tehdää
 ## Sivupaneeli 0.2.2
 
 Hampurilainen avaa oikealta liukuvan paneelin, jossa Lehdet ja Aiheet ovat suoraan valittavissa. Suodatus päivittyy sulkematta paneelia ja nykyinen valintojen tallennus säilyy. Paneelissa ovat myös Valitse kaikki, Palauta oletukset, Tietoa, versionumero ja päivitysaika. Sulje X:stä, himmennetystä taustasta tai Androidin paluutoiminnolla. Koko valintasisältö alaosan tietoineen vierii pienillä näytöillä.
+
+## Paikallinen sää (0.3.0)
+
+Sivupaneelista voi ottaa käyttöön Open-Meteon sään ja valita paikkakunnan käsin tai antaa likimääräisen sijaintiluvan. Oletuksena pois; uutiset toimivat ilman lupaa. Ei taustapaikannusta. [Tietolähteet, tietosuoja ja hälytystietojen saatavuusselvitys](docs/WEATHER_AND_ALERTS.md).
