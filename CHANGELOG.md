@@ -8,7 +8,7 @@
 - Hillityt punertavat tiedotekortit uutisten sekaan julkaisuajan mukaan; lisätiedoissa alkuperäiset ohjeet, päivitysaika, lähteen linkki ja lisenssi. Näkyvyys ei riipu uutissuodattimista.
 - Etäisyys lähimpään todellisen piste-, viiva- tai aluegeometrian kohtaan. Päättyneet ja perutut poistuvat, uudet versiot korvaavat vanhat. Puuttuvista sijainneista ei keksitä etäisyyksiä.
 - Viiden minuutin liikennevälimuisti ja erilliset haut; hakuhäiriö piilottaa varmentamattomat tiedotteet. Ei taustaseurantaa, sijaintihistoriaa tai ilmoituksia.
-- [Tietolähteet, ehdot ja rajoitteet](docs/WEATHER_AND_ALERTS.md) päivitetty. Tilannehuone-suunnitelma korvattu Digitrafficilla. Kohdennetut logiikkatestit ja Actions-tulos kirjataan julkaisun jälkeen. Ei emulaattoria tai paikallista Android-buildia.
+- [Tietolähteet, ehdot ja rajoitteet](docs/WEATHER_AND_ALERTS.md) päivitetty. Tilannehuone-suunnitelma korvattu Digitrafficilla. [Actions 42176131959](https://github.com/Tenuxi/Uutishetki/actions/runs/42176131959) läpäisi 34 testiä (11 liikenne-, 8 sää- ja 15 nykyistä uutis-/suodatustestiä), Android Lintin ja APK-käännöksen. Ensimmäisen ajon käännösvirhe korjattu ennen onnistunutta ajoa. [Julkaisu 42176564380](https://github.com/Tenuxi/Uutishetki/actions/runs/42176564380) varmisti allekirjoituksen, applicationId:n, version 0.4.0 ja versionCoden 6. [Lataa APK](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.4.0/Uutishetki-0.4.0.apk). Ei emulaattoria tai paikallista Android-buildia.
 - Nykyinen testiallekirjoituspolku säilyy; vanhan avaimen puuttuessa aiempi asennus voi vaatia poistamisen paikallisine tietoineen.
 
 ## 0.3.0 – 6.11.2026

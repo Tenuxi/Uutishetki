@@ -6,7 +6,7 @@ Uutiset näkyvät uusimmat ensin yhteisessä virrassa. Lähdesuodatin ja pysyvä
 
 ## Valmis APK
 
-[Lataa Uutishetki-0.3.0.apk](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.3.0/Uutishetki-0.3.0.apk) ja avaa tiedosto Androidissa. Avaimia tai GitHub-asetuksia ei tarvita asentamiseen. Paketti on testiallekirjoitettu debug-versio; tuleva eri avaimella allekirjoitettu päivitys voi vaatia vanhan version poistamisen. Versio 0.2.0 lisää Digi-syötteet, pysyvät monivalinnat ja erottuvamman ulkoasun. Alla oleva pysyvän avaimen ohje koskee myöhempää ylläpidettävää release-julkaisuketjua.
+[Lataa Uutishetki-0.4.0.apk](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.4.0/Uutishetki-0.4.0.apk) ja avaa tiedosto Androidissa. Avaimia tai GitHub-asetuksia ei tarvita asentamiseen. Paketti on testiallekirjoitettu debug-versio; tuleva eri avaimella allekirjoitettu päivitys voi vaatia vanhan version poistamisen. Versio 0.2.0 lisää Digi-syötteet, pysyvät monivalinnat ja erottuvamman ulkoasun. Alla oleva pysyvän avaimen ohje koskee myöhempää ylläpidettävää release-julkaisuketjua.
 
 ## Rakentaminen ja asentaminen
 
