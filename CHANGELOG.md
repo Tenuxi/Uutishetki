@@ -7,7 +7,7 @@
 - Sijaintilupa pyydetään vain käyttäjän valinnasta. Ei taustapaikannusta tai sijaintihistoriaa. Sää haetaan uutisista riippumatta 15 minuutin välein; vanhentunut tai epäonnistunut tieto ei näytä ajantasaiselta.
 - Open-Meteon maksuton ei-kaupallinen säärajapinta ja GeoNames-paikkakuntahaku. Lähteet, käyttöehdot, päivitysvälit ja rajoitteet: [selvitys](docs/WEATHER_AND_ALERTS.md).
 - Hälytysintegraatio jäi toteuttamatta: sopivaa avointa rajapintaa, uudelleenjulkaisuoikeutta ja riittävän tarkkoja tapahtumapaikkoja ei voitu varmistaa. Paneelissa tieto esteestä ja linkki Tilannehuone.fi:hin; ei keksittyjä hälytyksiä.
-- Seitsemän kohdennettua säälogiikan testiä. Ei paikallista Android-buildia tai emulaattoria. Laitteen lupadialogi, paikannus, kosketukset ja suuret tekstikoot jäävät laitteella tarkistettaviksi. Actions-tulos lisätään julkaisun jälkeen.
+- Seitsemän kohdennettua säälogiikan testiä. Ei paikallista Android-buildia tai emulaattoria. Laitteen lupadialogi, paikannus, kosketukset ja suuret tekstikoot jäävät laitteella tarkistettaviksi. [Actions-ajo 42173109551](https://github.com/Tenuxi/Uutishetki/actions/runs/42173109551) läpäisi kaikki 22 testiä, Android Lintin ja APK-käännöksen. [Julkaisuajo 42173372593](https://github.com/Tenuxi/Uutishetki/actions/runs/42173372593) varmisti allekirjoituksen ja version 0.3.0 / versionCode 5. [Lataa APK](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.3.0/Uutishetki-0.3.0.apk).
 - ApplicationId ja nykyinen julkaisutyönkulku säilyvät. Testiallekirjoituksen vaihtuminen voi edellyttää aiemman asennuksen poistamista ja poistaa sen paikalliset tiedot.
 
 ## 0.2.2 – 5.11.2026
