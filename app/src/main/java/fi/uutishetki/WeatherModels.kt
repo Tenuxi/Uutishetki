@@ -20,13 +20,11 @@ data class WeatherPlace(val name: String, val latitude: Double, val longitude: D
         fun fromJson(json: JSONObject) = WeatherPlace(json.getString("name"), json.getDouble("lat"), json.getDouble("lon"))
     }
 }
-data class WeatherSettings(val enabled: Boolean = false, val automatic: Boolean = false, val manual: WeatherPlace? = null) {
-    fun unavailableReason(hasPermission: Boolean): String? = when {
-        !enabled -> "Sää ei ole käytössä."
-        automatic && !hasPermission -> "Sijaintilupa puuttuu. Valitse automaattinen sijainti uudelleen tai paikkakunta käsin."
-        !automatic && manual == null -> "Valitse paikkakunta sääasetuksista."
-        else -> null
-    }
+val HELSINKI = WeatherPlace("Helsinki", 60.17, 24.94)
+
+data class WeatherSettings(val enabled: Boolean = true, val automatic: Boolean = true, val manual: WeatherPlace? = null) {
+    fun weatherPlace(located: WeatherPlace?): WeatherPlace = if (automatic) located ?: manual ?: HELSINKI else manual ?: HELSINKI
+    fun trafficPlace(located: WeatherPlace?): WeatherPlace? = if (automatic) located else manual
     fun encode(): String = JSONObject().put("enabled", enabled).put("automatic", automatic)
         .put("manual", manual?.json() ?: JSONObject.NULL).toString()
     companion object {
@@ -55,7 +53,7 @@ data class WeatherData(val place: WeatherPlace, val temperature: Double, val cod
     }
 }
 data class WeatherUiState(val data: WeatherData? = null, val loading: Boolean = false,
-    val error: String? = null, val now: Long = System.currentTimeMillis()) {
+    val error: String? = null, val requestedPlace: WeatherPlace = HELSINKI, val now: Long = System.currentTimeMillis()) {
     val current: WeatherData? get() = data?.takeIf { error == null && it.isFresh(now) }
 }
 object WeatherParser {

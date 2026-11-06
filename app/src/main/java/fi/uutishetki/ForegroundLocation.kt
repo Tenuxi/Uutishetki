@@ -35,9 +35,9 @@ class ForegroundLocation(private val context: Context) {
             }
         } ?: return null
         val age = (SystemClock.elapsedRealtimeNanos() - location.elapsedRealtimeNanos) / 1_000_000
-        if (age !in 0..5 * 60_000 || !location.hasAccuracy() || location.accuracy > 25_000) return null
-        val point = WeatherPlace("Nykyinen sijainti (paikkakunta ei saatavilla)", location.latitude, location.longitude).rounded()
-        val name = locality(point)
+        if (age !in 0..5 * 60_000 || !location.hasAccuracy() || location.accuracy > 2_000) return null
+        val point = WeatherPlace("Nykyinen sijainti (paikkakunta ei saatavilla)", location.latitude, location.longitude)
+        val name = locality(point.rounded())
         return if (name.isNullOrBlank()) point else point.copy(name = name.take(200))
     }
     @Suppress("DEPRECATION")

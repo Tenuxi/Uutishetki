@@ -23,6 +23,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun RightFilterDrawer(
     weather: WeatherViewModel,
+    traffic: TrafficViewModel,
     onAutomaticWeather: () -> Unit,
     drawerState: DrawerState,
     selection: Selection,
@@ -97,6 +98,7 @@ fun RightFilterDrawer(
                                     }
                                 }
                                 item { WeatherSettingsContent(weather, onAutomaticWeather) }
+                                item { TrafficSettingsContent(traffic, weather) }
                                 // Footer shares the scroll container so it cannot overlap the choices.
                                 item {
                                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {

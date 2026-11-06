@@ -1,6 +1,6 @@
 # Uutishetki
 
-Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.3.0**, versionCode **5**.
+Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.4.0**, versionCode **6**.
 
 Uutiset näkyvät uusimmat ensin yhteisessä virrassa. Lähdesuodatin ja pysyvä aiheiden monivalinta (oletuksena kaikki paitsi Urheilu), lyhyet RSS-kuvaukset, syötteen kuvat ja alkuperäisten artikkelien avaaminen Custom Tabsissa / selaimessa. Ei mainos-, analytiikka- tai AI-SDK:ita, tilejä eikä palvelinta. Julkaisijoiden sivujen mainoksia, evästeitä ja maksumuureja ei muuteta.
 
@@ -103,6 +103,6 @@ Vanhan 0.2.0-version allekirjoitusavain puuttuu. Version 0.2.1 julkaisu tehdää
 
 Hampurilainen avaa oikealta liukuvan paneelin, jossa Lehdet ja Aiheet ovat suoraan valittavissa. Suodatus päivittyy sulkematta paneelia ja nykyinen valintojen tallennus säilyy. Paneelissa ovat myös Valitse kaikki, Palauta oletukset, Tietoa, versionumero ja päivitysaika. Sulje X:stä, himmennetystä taustasta tai Androidin paluutoiminnolla. Koko valintasisältö alaosan tietoineen vierii pienillä näytöillä.
 
-## Paikallinen sää (0.3.0)
+## Sää ja lähialueen liikennetiedotteet (0.4.0)
 
-Sivupaneelista voi ottaa käyttöön Open-Meteon sään ja valita paikkakunnan käsin tai antaa likimääräisen sijaintiluvan. Oletuksena pois; uutiset toimivat ilman lupaa. Ei taustapaikannusta. [Tietolähteet, tietosuoja ja hälytystietojen saatavuusselvitys](docs/WEATHER_AND_ALERTS.md).
+Uudella asennuksella Helsingin sää näkyy heti. Automaattinen sijainti vaihtaa sään käyttäjän lähelle luvan jälkeen; paikkakunnan voi valita käsin. Aiemmat asetukset säilyvät. Digitrafficin liikenteen häiriötiedotteet näkyvät punertavina kortteina uutisten joukossa; oletussäde 10 km. Ilman sijaintia tai omaa paikkakuntavalintaa liikennetiedotteet odottavat, eivät näytä Helsinkiä käyttäjän lähialueena. Sää ja liikenne voidaan kytkeä pois erikseen. Ei taustapaikannusta tai ilmoituksia. [Tietolähteet, käyttöehdot ja rajoitteet](docs/WEATHER_AND_ALERTS.md).

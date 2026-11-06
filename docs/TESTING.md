@@ -43,3 +43,11 @@ Koodista tarkistettu: lupa vain automaattisen sijainnin painikkeesta, sää pois
 Ei laite-/emulaattoritestiä: tarkista luvan hyväksyminen/epääminen/peruminen asetuksista, paikannus pois laitteesta, manuaalinen Helsinki-haku, lentotila, prosessin uudelleenkäynnistys, siirtyminen taustalle, sää pois/päälle, pienin näyttö ja suurin fontti, TalkBack sekä säätietojen ja paneelin vieritys. Etäisyyssuodatusta tai epätarkkoja tapahtumasijainteja ei testata, koska hälytyslähteen puuttuessa näitä toimintoja ei toteutettu.
 
 0.3.0:n tulos: [Actions 42173109551](https://github.com/Tenuxi/Uutishetki/actions/runs/42173109551) onnistui; HTML-testiraportissa 22 testiä, 0 virhettä, 0 ohitettua (7 säätestiä ja 15 nykyistä). Android Lint ja APK-käännös onnistuivat. [Julkaisu 42173372593](https://github.com/Tenuxi/Uutishetki/actions/runs/42173372593) varmisti APK:n allekirjoituksen ja pakettimetatiedot.
+
+## 0.4.0 — sääoletukset ja liikennetiedotteet
+
+Kohdennetut yksikkötestit: Helsingin säävarapaikka erillään liikennesijainnista, paikannetun ja käsin valitun paikan etusija, aiemman pois-valinnan säilyminen; liikenteen asetusten palautus, etäisyys pisteeseen/viivan lähimpään kohtaan/alueeseen ja aukkoihin, puuttuva tai virheellinen geometria, alueen keskipisteen hylkääminen, päättyneet ja perutut versiot, vakaa korttiavain ja alkuperäinen julkaisuaika, välimuistin vanheneminen ja hakuhäiriö, lähteen ohjeiden säilyminen sekä varmennettu v2-vastausotos.
+
+Koodista tarkistettu: lupa pyydetään ensikäynnistyksen perustelun Jatka-painikkeesta, päätös tallennetaan ennen Android-dialogia. Helsingin sää ja uutiset alkavat rinnalla. Lupaa ei tarvita käsivalintaan; automaattinen paikkatieto tyhjenee taustalla. Liikenne ei käytä sään varapaikkaa. Lehti-/aihevalinnat koskevat vain uutisia. Sää/paikannus/liikenne ovat erillisiä lifecycle-sidottuja coroutineja. Sijaintiasetukset ovat käytettävissä myös sään ollessa pois päältä.
+
+Laitteella testaamatta: ensiasennuksen perustelu ja Android-lupa (hyväksy/epää/peru asetuksista), paikannuksen onnistuminen ja aikakatkaisu, käsipaikan haku, prosessin uudelleenkäynnistys, offline/online, paneelin ja tiedotedialogin vieritys, TalkBack, pienet näytöt ja suuret fontit. Ei emulaattoria, paikallista Android-buildia tai ulkoasuyksikkötestejä.

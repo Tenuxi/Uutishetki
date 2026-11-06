@@ -20,12 +20,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 @Composable
 fun WeatherButton(state: WeatherUiState, onClick: () -> Unit) {
     val current = state.current
-    TextButton(onClick = onClick, modifier = Modifier.widthIn(max = 112.dp).heightIn(min = 48.dp)
-        .semantics { contentDescription = if (current != null) "Sää: ${current.temperatureLabel}, ${weatherDescription(current.code)}. Open-Meteo. Avaa säätiedot."
-            else "Sää ei saatavilla. Avaa säätiedot." }, contentPadding = PaddingValues(horizontal = 6.dp)) {
+    TextButton(onClick = onClick, modifier = Modifier.widthIn(max = 156.dp).heightIn(min = 48.dp)
+        .semantics { contentDescription = if (current != null) "${current.place.name}, sää: ${current.temperatureLabel}, ${weatherDescription(current.code)}. Open-Meteo. Avaa säätiedot."
+            else "${state.requestedPlace.name}: ${if (state.loading) "Säätä haetaan" else "Sää ei saatavilla"}. Avaa säätiedot." }, contentPadding = PaddingValues(horizontal = 6.dp)) {
         WeatherIcon(current?.let { weatherSymbol(it.code, it.isDay) } ?: WeatherSymbol.UNKNOWN)
         Spacer(Modifier.width(4.dp))
-        Text(current?.temperatureLabel ?: "—", fontSize = 14.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Column(Modifier.weight(1f, fill = false)) {
+            Text(current?.temperatureLabel ?: if (state.loading) "…" else "—", fontSize = 14.sp, maxLines = 1)
+            Text((current?.place ?: state.requestedPlace).name.substringBefore(","), fontSize = 11.sp,
+                maxLines = 1, overflow = TextOverflow.Ellipsis)
+        }
     }
 }
 @Composable
@@ -50,7 +54,8 @@ fun WeatherDetails(state: WeatherUiState, automatic: Boolean, onSettings: () -> 
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 if (state.loading) Text("Päivitetään säätä…")
-                state.error?.let { Text(it) }
+                locationMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
+            state.error?.let { Text(it) }
                 val data = state.data
                 if (data != null) {
                     Text(data.place.name, style = MaterialTheme.typography.titleMedium)
@@ -61,7 +66,7 @@ fun WeatherDetails(state: WeatherUiState, automatic: Boolean, onSettings: () -> 
                     Text("Säätiedon ajankohta ${formatDate(data.observedAt)}")
                     Text("Haettu ${formatDate(data.fetchedAt)}")
                 } else if (!state.loading && state.error == null) Text("Säätietoa ei vielä ole. Valitse sijainti sääasetuksista.")
-                Text(if (automatic) "Sää kohdistetaan likimääräiseen nykyiseen sijaintiin." else "Sää kohdistetaan valitun paikkakunnan keskipisteeseen.")
+                Text(if (automatic) "Sää kohdistetaan saatavilla olevaan sijaintiin tai yllä nimettyyn varapaikkakuntaan." else "Sää kohdistetaan valitun paikkakunnan keskipisteeseen.")
                 Text("Sää on mallipohjainen arvio, ei paikallinen mittaus. Lämpötila on pyöristetty kokonaisasteiksi.")
                 WeatherAttribution()
             }
@@ -73,7 +78,8 @@ fun WeatherSettingsContent(vm: WeatherViewModel, onAutomatic: () -> Unit) {
     val settings by vm.settings.collectAsStateWithLifecycle()
     val state by vm.state.collectAsStateWithLifecycle()
     var searchOpen by rememberSaveable { mutableStateOf(false) }
-    val context = LocalContext.current
+    val locationMessage by vm.locationMessage.collectAsStateWithLifecycle()
+    val located by vm.currentLocation.collectAsStateWithLifecycle()
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         HorizontalDivider()
         Text("Paikallinen sää", style = MaterialTheme.typography.titleMedium)
@@ -84,27 +90,25 @@ fun WeatherSettingsContent(vm: WeatherViewModel, onAutomatic: () -> Unit) {
         }
         Text("Vapaaehtoinen. Open-Meteo saa valitun paikan tai pyöristetyt koordinaatit ja IP-osoitteen. Ei taustapaikannusta.",
             style = MaterialTheme.typography.bodySmall)
-        if (settings.enabled) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Sään ja liikennetiedotteiden sijainti", style = MaterialTheme.typography.titleSmall)
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 FilterChip(selected = settings.automatic, onClick = onAutomatic, label = { Text("Automaattinen sijainti") })
                 FilterChip(selected = !settings.automatic, onClick = { vm.manualMode() }, label = { Text("Paikkakunta käsin") })
             }
             if (settings.automatic) {
-                Text(state.data?.place?.name ?: "Nykyinen sijainti", style = MaterialTheme.typography.bodyMedium)
+                Text(located?.name ?: "Sään varapaikka: ${settings.weatherPlace(null).name}", style = MaterialTheme.typography.bodyMedium)
                 Text("Likimääräinen sijainti päivitetään vain sovellusta käytettäessä. Paikannimen haku käyttää laitteen paikkapalvelua.", style = MaterialTheme.typography.bodySmall)
             } else {
                 Text(settings.manual?.name ?: "Paikkakuntaa ei valittu")
                 TextButton(onClick = { searchOpen = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Valitse paikkakunta") }
-                Text("Käytetään paikkakunnan keskipistettä, ei omaa tarkkaa sijaintiasi. Mahdollinen tuleva etäisyysrajaus laskettaisiin tästä pisteestä.", style = MaterialTheme.typography.bodySmall)
+                Text("Sää ja liikennetiedotteiden etäisyydet käyttävät paikkakunnan keskipistettä, eivät omaa tarkkaa sijaintiasi.", style = MaterialTheme.typography.bodySmall)
             }
+            locationMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
             state.error?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
             WeatherAttribution()
         }
-        HorizontalDivider()
-        Text("Lähialueen hälytykset", style = MaterialTheme.typography.titleMedium)
-        Text("Ei käytössä: soveltuvaa avointa hälytysrajapintaa ja sen käyttöoikeutta ei ole voitu varmistaa. Uutisvirta ei sisällä hälytystapahtumia.",
-            style = MaterialTheme.typography.bodySmall)
-        TextButton(onClick = { openArticle(context, "https://www.tilannehuone.fi/") }) { Text("Avaa Tilannehuone.fi selaimessa") }
+
     }
     if (searchOpen) PlaceSearchDialog(vm, onDismiss = { searchOpen = false; vm.dismissSearch() })
 }

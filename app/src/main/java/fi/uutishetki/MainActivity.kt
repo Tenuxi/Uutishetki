@@ -89,7 +89,11 @@ internal fun formatDate(millis: Long) = finnishDate.format(Instant.ofEpochMilli(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = viewModel()) {
+fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = viewModel(), traffic: TrafficViewModel = viewModel()) {
+    val trafficState by traffic.state.collectAsStateWithLifecycle()
+    val trafficSettings by traffic.settings.collectAsStateWithLifecycle()
+    val offerPermission by weather.offerPermission.collectAsStateWithLifecycle()
+    val located by weather.currentLocation.collectAsStateWithLifecycle()
     val weatherSettings by weather.settings.collectAsStateWithLifecycle()
     val weatherState by weather.state.collectAsStateWithLifecycle()
     var weatherDetails by rememberSaveable { mutableStateOf(false) }
@@ -97,7 +101,8 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
         if (granted) weather.automatic() else weather.permissionDenied()
     }
     val automaticWeather: () -> Unit = {
-        if (weather.hasLocationPermission()) weather.automatic() else permission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
+        weather.automatic()
+        if (!weather.hasLocationPermission()) permission.launch(Manifest.permission.ACCESS_COARSE_LOCATION)
     }
     val news by vm.repository.news.collectAsStateWithLifecycle()
     val loading by vm.repository.loading.collectAsStateWithLifecycle()
@@ -107,6 +112,8 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
     val selection by vm.selection.collectAsStateWithLifecycle()
     val source = selection.source
     val visible = remember(news, selection) { news.filtered(selection) }
+    val nearby = if (trafficSettings.enabled && weatherSettings.trafficPlace(located) != null && trafficState.place == weatherSettings.trafficPlace(located) && trafficState.radius == trafficSettings.radius) trafficState.nearby else emptyList()
+    val feed = remember(visible, nearby) { mergeFeed(visible, nearby) }
     val active = source != null || selection.topics != Topic.entries.toSet()
     var about by rememberSaveable { mutableStateOf(false) }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
@@ -128,13 +135,32 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
     }
     LaunchedEffect(lifecycle, weather) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-            combine(weather.settings, weather.refreshToken) { settings, token -> settings to token }.collectLatest {
+            combine(weather.settings, weather.refreshToken, weather.currentLocation) { settings, token, place -> Triple(settings, token, place) }.collectLatest {
                 while (isActive) { weather.refresh(); delay(60_000) }
             }
         }
     }
+    LaunchedEffect(lifecycle, weather, traffic) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            try {
+                combine(weather.settings, weather.refreshToken, traffic.settings) { settings, token, trafficConfig -> Triple(settings, token, trafficConfig.enabled) }.collectLatest {
+                    while (isActive) {
+                        if (it.first.enabled || it.third) weather.refreshLocation() else weather.onBackground()
+                        delay(5 * 60_000L)
+                    }
+                }
+            } finally { weather.onBackground() }
+        }
+    }
+    LaunchedEffect(lifecycle, traffic, weather) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            combine(weather.settings, weather.currentLocation, traffic.settings) { config, place, _ -> config.trafficPlace(place) }.collectLatest { place ->
+                while (isActive) { traffic.refresh(place); delay(15_000) }
+            }
+        }
+    }
     LaunchedEffect(selection) { listState.scrollToItem(0) }
-    RightFilterDrawer(weather = weather, onAutomaticWeather = automaticWeather, drawerState = drawerState, selection = selection, updated = updated,
+    RightFilterDrawer(weather = weather, traffic = traffic, onAutomaticWeather = automaticWeather, drawerState = drawerState, selection = selection, updated = updated,
         onSource = vm::source, onTopic = vm::toggle, onAllTopics = vm::allTopics,
         onDefaults = vm::defaults, onAbout = { scope.launch { drawerState.close(); about = true } }) {
     Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
@@ -149,6 +175,9 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp,
                     top = headerHeight + 8.dp, bottom = safePadding.calculateBottomPadding() + 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                if (trafficSettings.enabled && trafficState.unavailable) item(key = "traffic-error") {
+                    Text(trafficState.message.orEmpty(), style = MaterialTheme.typography.bodySmall)
+                }
                 if (message != null) item(key = "error") {
                     Surface(color = MaterialTheme.colorScheme.errorContainer, shape = MaterialTheme.shapes.medium) {
                         Column(Modifier.padding(16.dp)) {
@@ -157,7 +186,7 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
                         }
                     }
                 }
-                if (visible.isEmpty()) item(key = "empty") {
+                if (feed.isEmpty()) item(key = "empty") {
                     Column(Modifier.fillMaxWidth().padding(vertical = 48.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         if (selection.topics.isEmpty()) {
                             Text("Ei aiheita valittu", style = MaterialTheme.typography.titleMedium)
@@ -174,7 +203,12 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
                         }
                     }
                 }
-                items(visible, key = { it.id }) { newsItem -> NewsCard(newsItem) }
+                items(feed, key = { it.key }) { entry ->
+                    when (entry) {
+                        is FeedEntry.Article -> NewsCard(entry.news)
+                        is FeedEntry.Traffic -> TrafficCard(entry.item, trafficState.checkedAt)
+                    }
+                }
                 item(key = "footer") { Text("Otsikot ja sisällöt kuuluvat uutislähteille.\nKoko artikkeli avautuu julkaisijan sivulla.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             }
         }
@@ -197,6 +231,11 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
         }
     }
     }
+    if (offerPermission) AlertDialog(onDismissRequest = { weather.permissionExplained() },
+        title = { Text("Paikallinen sää ja liikennetiedotteet") },
+        text = { Text("Sijaintia käytetään paikalliseen säähän ja lähialueen liikennetiedotteisiin vain sovellusta käyttäessäsi. Sijaintihistoriaa ei tallenneta. Ilman lupaa näytämme Helsingin sään; voit myös valita paikkakunnan käsin. Open-Meteo saa sään koordinaatit ja IP-osoitteen.") },
+        confirmButton = { TextButton(onClick = { weather.permissionExplained(); automaticWeather() }) { Text("Jatka sijaintilupaan") } },
+        dismissButton = { TextButton(onClick = { weather.permissionExplained() }) { Text("Ei nyt") } })
     if (weatherDetails) WeatherDetails(weatherState, weatherSettings.automatic,
         onSettings = { weatherDetails = false; openDrawer() }, onDismiss = { weatherDetails = false })
     if (about) AlertDialog(onDismissRequest = { about = false }, confirmButton = { TextButton(onClick = { about = false }) { Text("Sulje") } },

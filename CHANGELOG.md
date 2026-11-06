@@ -1,5 +1,16 @@
 # Muutosloki
 
+## 0.4.0 – 6.11.2026
+
+- Sää näkyy uudella asennuksella heti Helsingin säällä. Yläpalkissa paikkakunta, sääkuvake ja lämpötila tai lataustila.
+- Automaattinen sijainti oletuksena; ensikäynnistyksen perustelu ja käyttäjän käynnistämä Android-lupakysely. Luvan epäämistä ei kysytä uudelleen automaattisesti. Käsivalinta ohittaa paikannuksen, aiemmat asetukset säilyvät.
+- Lähialueen liikennetiedotteet Fintrafficin Digitraffic v2 -rajapinnasta. Oletuksena päällä, säde 10 km; valinnat 5/10/25/50 km ja pois-kytkentä tallennetaan. Helsinki on vain sään varapaikka, ei liikenteen oletussijainti.
+- Hillityt punertavat tiedotekortit uutisten sekaan julkaisuajan mukaan; lisätiedoissa alkuperäiset ohjeet, päivitysaika, lähteen linkki ja lisenssi. Näkyvyys ei riipu uutissuodattimista.
+- Etäisyys lähimpään todellisen piste-, viiva- tai aluegeometrian kohtaan. Päättyneet ja perutut poistuvat, uudet versiot korvaavat vanhat. Puuttuvista sijainneista ei keksitä etäisyyksiä.
+- Viiden minuutin liikennevälimuisti ja erilliset haut; hakuhäiriö piilottaa varmentamattomat tiedotteet. Ei taustaseurantaa, sijaintihistoriaa tai ilmoituksia.
+- [Tietolähteet, ehdot ja rajoitteet](docs/WEATHER_AND_ALERTS.md) päivitetty. Tilannehuone-suunnitelma korvattu Digitrafficilla. Kohdennetut logiikkatestit ja Actions-tulos kirjataan julkaisun jälkeen. Ei emulaattoria tai paikallista Android-buildia.
+- Nykyinen testiallekirjoituspolku säilyy; vanhan avaimen puuttuessa aiempi asennus voi vaatia poistamisen paikallisine tietoineen.
+
 ## 0.3.0 – 6.11.2026
 
 - Vapaaehtoinen paikallinen sää yläpalkkiin: sääkuvake, lämpötila ja napautettavat lisätiedot lähdemerkintöineen.

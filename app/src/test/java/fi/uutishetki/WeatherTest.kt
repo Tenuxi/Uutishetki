@@ -9,7 +9,7 @@ class WeatherTest {
     private fun response(temp: String = "4.2", seconds: Long = now / 1000, unit: String = "°C") =
         """{"current_units":{"temperature_2m":"$unit","time":"unixtime"},"current":{"time":$seconds,"temperature_2m":$temp,"weather_code":3,"is_day":1}}"""
 
-    @Test fun settingsDefaultOffAndPersistManualAndAutomatic() {
+    @Test fun settingsDefaultOnAndPersistManualAndAutomatic() {
         assertEquals(WeatherSettings(), WeatherSettings.decode(null))
         assertEquals(WeatherSettings(), WeatherSettings.decode("broken"))
         for (automatic in listOf(false, true)) {
@@ -18,12 +18,28 @@ class WeatherTest {
             assertEquals(settings.copy(enabled = false), WeatherSettings.decode(settings.copy(enabled = false).encode()))
         }
     }
-    @Test fun manualWorksWithoutPermissionButAutomaticRequiresPermission() {
-        assertNull(WeatherSettings(true, false, place).unavailableReason(false))
-        assertNotNull(WeatherSettings(true, true, place).unavailableReason(false))
-        assertNull(WeatherSettings(true, true).unavailableReason(true))
-        assertNotNull(WeatherSettings(true).unavailableReason(true))
-        assertNotNull(WeatherSettings().unavailableReason(true))
+    @Test fun fallbackWeatherNeverBecomesTrafficLocation() {
+        val settings = WeatherSettings()
+        assertTrue(settings.enabled)
+        assertTrue(settings.automatic)
+        assertEquals(HELSINKI, settings.weatherPlace(null))
+        assertNull(settings.trafficPlace(null))
+        assertEquals(place, settings.weatherPlace(place))
+        assertEquals(place, settings.trafficPlace(place))
+        val manual = WeatherSettings(true, false, place)
+        assertEquals(place, manual.weatherPlace(HELSINKI))
+        assertEquals(place, manual.trafficPlace(HELSINKI))
+        assertEquals(place, manual.weatherPlace(null))
+        assertEquals(place, settings.copy(manual = place).weatherPlace(null))
+        assertNull(settings.copy(manual = place).trafficPlace(null))
+    }
+    @Test fun previousExplicitOffAndManualChoicesSurviveUpgrade() {
+        val old = """{"enabled":false,"automatic":false,"manual":{"name":"Oulu","lat":65.01,"lon":25.47}}"""
+        val settings = WeatherSettings.decode(old)
+        assertFalse(settings.enabled)
+        assertFalse(settings.automatic)
+        assertEquals("Oulu", settings.weatherPlace(null).name)
+        assertEquals(settings, WeatherSettings.decode(settings.encode()))
     }
     @Test fun validWeatherAndCacheRoundTrip() {
         val data = WeatherParser.current(response(), place, now)

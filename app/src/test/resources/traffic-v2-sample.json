@@ -1,0 +1,90 @@
+{
+  "type": "FeatureCollection",
+  "dataUpdatedTime": "2026-11-06T06:20:51.009Z",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.358611,
+          60.375877
+        ]
+      },
+      "properties": {
+        "situationId": "GUID50473268",
+        "situationType": "traffic announcement",
+        "trafficAnnouncementType": "accident report",
+        "version": 1,
+        "releaseTime": "2026-11-06T06:20:27.249Z",
+        "versionTime": "2026-11-06T06:20:27.244Z",
+        "announcements": [
+          {
+            "language": "fi",
+            "title": "Tie 1531, Sipoo. Liikennetiedote onnettomuudesta. ",
+            "location": {
+              "countryCode": 6,
+              "locationTableNumber": 17,
+              "locationTableVersion": "1.11.45",
+              "description": "Tie 1531 välillä Savijärvi - Porvoo, Sipoo.\nTarkempi paikka: Paikasta Öljytie 1,5 km, suuntaan Ollin tasoristeys."
+            },
+            "locationDetails": {
+              "roadAddressLocation": {
+                "primaryPoint": {
+                  "municipality": "Sipoo",
+                  "province": "Uusimaa",
+                  "country": "Suomi",
+                  "roadAddress": {
+                    "road": 1531,
+                    "roadSection": 1,
+                    "distance": 1488
+                  },
+                  "alertCLocation": {
+                    "locationCode": 4288,
+                    "name": "Öljytie",
+                    "distance": 1488
+                  }
+                },
+                "secondaryPoint": {
+                  "municipality": "Sipoo",
+                  "province": "Uusimaa",
+                  "country": "Suomi",
+                  "roadAddress": {
+                    "road": 1531,
+                    "roadSection": 1,
+                    "distance": 1488
+                  },
+                  "alertCLocation": {
+                    "locationCode": 42782,
+                    "name": "Ollin tasoristeys",
+                    "distance": 1607
+                  }
+                },
+                "direction": "unknown"
+              }
+            },
+            "locationOpenLr": {
+              "binary": "IxIIZirvGA=="
+            },
+            "features": [
+              {
+                "name": "Onnettomuus"
+              }
+            ],
+            "roadWorkPhases": [],
+            "timeAndDuration": {
+              "startTime": "2026-11-06T06:19:00.000Z"
+            },
+            "additionalInformation": "Liikenne- ja kelitiedot verkossa: https://liikennetilanne.fintraffic.fi/",
+            "sender": "Fintraffic Tieliikennekeskus"
+          }
+        ],
+        "contact": {
+          "phone": "02002100",
+          "email": "helsinki.liikennekeskus@fintraffic.fi"
+        },
+        "dataUpdatedTime": "2026-11-06T06:20:51.009Z"
+      }
+    }
+  ]
+}
