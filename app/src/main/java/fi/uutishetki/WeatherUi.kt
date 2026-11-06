@@ -54,7 +54,6 @@ fun WeatherDetails(state: WeatherUiState, automatic: Boolean, onSettings: () -> 
         text = {
             Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 if (state.loading) Text("Päivitetään säätä…")
-                locationMessage?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
             state.error?.let { Text(it) }
                 val data = state.data
                 if (data != null) {
