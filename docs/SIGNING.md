@@ -71,3 +71,16 @@ GitHubin `GITHUB_TOKEN` riittää buildin ja julkaisun aikana Secrets-arvojen k�
 6. Vasta kaikkien tarkistusten jälkeen Releasesiin lisätään release-APK ja APK:n SHA-256-tiedostotiiviste (eri asia kuin varmenteen SHA-256). Avainta tai salasanoja ei liitetä mukaan.
 
 Normaali CI voi edelleen rakentaa debug-kehitysartifactin ilman salaisuuksia, mutta sitä ei koskaan käytetä julkaisutyössä. Vanha vaihtoehtoinen v-tagien julkaisu-job on poistettu; molemmat tagimuodot käyttävät samaa varmennettua release-polkua. Älä korvaa jo jaettua APK:ta samalla versionCodella. Epäonnistuneen, vielä julkaisemattoman tagin työn voi ajaa uudelleen salaisuuksien korjauksen jälkeen.
+
+## Käyttöönoton tila
+
+Main-commit `8697b33` läpäisi [Actions-ajon 42772338669](https://github.com/Tenuxi/Uutishetki/actions/runs/42772338669). GitHub CLI asennettu virallisesta tarkistussummalla varmennetusta jakelusta polkuun `~/.local/bin/gh`. Secrets-siirto ja release-julkaisu odottavat käyttäjän kirjautumista; kirjautumistiedostoa ei ollut vielä saatavilla tarkistushetkellä. Salaisuuksia ei ole oletettu lisätyiksi.
+
+Kirjautumisen jälkeen suorita repon hakemistossa `python3 scripts/upload_signing_secrets.py`. Jos käyttäjällä ei ole tarvittavaa Secrets-oikeutta, repon omistaja voi tehdä saman suojatulla avainkopiolla. Kun siirto onnistuu, version 0.5.1 julkaisu voidaan käynnistää tarkistetusta commitista:
+
+```sh
+git tag apk-0.5.1 8697b33
+git push origin apk-0.5.1
+```
+
+Tagia ei ole vielä luotu. Release-APK:n varmenne ja ei-debug-tila tarkistetaan varsinaisen release-käännöksen jälkeen; niiden onnistumista ei väitetä ennen sitä.

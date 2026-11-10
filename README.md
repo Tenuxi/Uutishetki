@@ -6,7 +6,9 @@ Uutiset näkyvät uusimmat ensin yhteisessä virrassa. Lähdesuodatin ja pysyvä
 
 ## Valmis APK
 
-[Lataa Uutishetki-0.5.0.apk](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.5.0/Uutishetki-0.5.0.apk) ja avaa tiedosto Androidissa. Avaimia tai GitHub-asetuksia ei tarvita asentamiseen. Paketti on testiallekirjoitettu debug-versio; tuleva eri avaimella allekirjoitettu päivitys voi vaatia vanhan version poistamisen. Versio 0.2.0 lisää Digi-syötteet, pysyvät monivalinnat ja erottuvamman ulkoasun. Alla oleva pysyvän avaimen ohje koskee myöhempää ylläpidettävää release-julkaisuketjua.
+Version **0.5.1 release-julkaisu odottaa GitHub Secrets -asetusten viimeistelyä**. Työnkulku ja main-tarkistus ovat valmiit; uutta APK:ta ei vielä ole julkaistu. [Käyttöönotto-ohje](docs/SIGNING.md).
+
+[Aiempi Uutishetki-0.5.0.apk](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.5.0/Uutishetki-0.5.0.apk) on vanhalla vaihtuvalla debug-avaimella allekirjoitettu, eikä se sisällä allekirjoituskorjausta.
 
 ## Rakentaminen ja asentaminen
 
@@ -19,7 +21,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 
 Varsinaiset buildit tekee [GitHub Actions](https://github.com/Tenuxi/Uutishetki/actions). Main-haara ja PR:t rakentavat debug-APK:n Actions-artifactiksi. Se on kehitysversio, ei pysyvällä avaimella allekirjoitettu julkaisu; älä käytä sitä ystäville jaettavana päivitysketjuna.
 
-Uusi release-APK löytyy onnistuneen tagityön jälkeen [Releases-sivulta](https://github.com/Tenuxi/Uutishetki/releases). Lataa puhelimeen `Uutishetki-0.1.0.apk`, salli tarvittaessa APK:n avaavalle selaimelle/tiedostonhallinnalle sovellusten asentaminen ja avaa tiedosto. Uusi release asennetaan vanhan päälle. Debug-versiosta siirtyminen releaseen vaatii debug-version poistamisen (paikalliset uutiset häviävät). Yksityisen repon lataukset edellyttävät repo-oikeuksia; APK:n voi jakaa erikseen.
+Uusi release-APK löytyy onnistuneen tagityön jälkeen [Releases-sivulta](https://github.com/Tenuxi/Uutishetki/releases). Lataa puhelimeen julkaistun version APK, salli tarvittaessa APK:n avaavalle selaimelle/tiedostonhallinnalle sovellusten asentaminen ja avaa tiedosto. Uusi release asennetaan vanhan päälle. Debug-versiosta siirtyminen releaseen vaatii debug-version poistamisen (paikalliset uutiset häviävät). Yksityisen repon lataukset edellyttävät repo-oikeuksia; APK:n voi jakaa erikseen.
 
 ## Pysyvä allekirjoitus ja julkaisu
 

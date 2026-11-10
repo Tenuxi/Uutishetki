@@ -69,3 +69,5 @@ Laitteella testaamatta: todellinen selaimen/Custom Tabsin paluu, Home/viimeisimm
 Aiemmista 0.2.0-, 0.4.0- ja 0.5.0-julkaisuista luettu APK v2 -lohkon varmenteet ja binäärisen manifestin package/versionCode/versionName/debuggable. Eri debug-varmenteet varmistettu, applicationId sama ja versionCode kasvava. Paikallinen debug-varmenne ei vastannut niitä.
 
 Kolme kohdennettua Python-testiä: salaisuuksien puuttuminen, väärä alias/base64, puuttuva/väärä/ylimääräinen varmenne sekä debug- tai väärän sovelluksen/version APK hylätään. Positiiviset tapaukset hyväksytään. YAML-jäsennys ja julkaisumetatiedot tarkistettu paikallisesti. Varsinainen APK rakennetaan Actionsissa, ei paikallisesti. Fyysistä päivitysasennusta tai tietojen säilymistä laitteella ei ole testattu.
+
+0.5.1:n main-tarkistus: [Actions 42772338669](https://github.com/Tenuxi/Uutishetki/actions/runs/42772338669) onnistui. Lisäksi alkuperäisen keystoren ja paikallisen varakopion varmenteet palautettiin OpenSSL:llä ja SHA-256 verrattiin lukitukseen; tiedosto-oikeudet 0600. Release-käännös ja valmiin release-APK:n varmenne odottavat Secrets-käyttöönottoa. Päivitysasennusta laitteella ei testattu.
