@@ -21,12 +21,12 @@ import kotlin.math.roundToInt
 private fun distanceLabel(distance: Double) = if (distance < 1) "alle 1 km geometriasta" else "noin ${distance.roundToInt()} km geometriasta"
 
 @Composable
-fun TrafficCard(item: NearbyTraffic, checkedAt: Long) {
+fun TrafficCard(item: NearbyTraffic, checkedAt: Long, onOpen: () -> Unit = {}) {
     var details by remember { mutableStateOf(false) }
     val notice = item.notice
-    Card(onClick = { details = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFF0EF), contentColor = Color(0xFF292323)),
-        border = BorderStroke(1.dp, Color(0xFFE2CDCB)), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+    Card(onClick = { onOpen(); details = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFDAD6), contentColor = Color(0xFF292323)),
+        border = BorderStroke(1.dp, Color(0xFFD7ABA6)), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Icon(painterResource(R.drawable.ic_traffic), contentDescription = null, modifier = Modifier.size(20.dp))

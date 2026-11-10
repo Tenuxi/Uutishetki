@@ -53,3 +53,11 @@ Koodista tarkistettu: lupa pyydetään ensikäynnistyksen perustelun Jatka-paini
 Laitteella testaamatta: ensiasennuksen perustelu ja Android-lupa (hyväksy/epää/peru asetuksista), paikannuksen onnistuminen ja aikakatkaisu, käsipaikan haku, prosessin uudelleenkäynnistys, offline/online, paneelin ja tiedotedialogin vieritys, TalkBack, pienet näytöt ja suuret fontit. Ei emulaattoria, paikallista Android-buildia tai ulkoasuyksikkötestejä.
 
 0.4.0:n toteutuneet tarkistukset: ensimmäisen Actions-ajon säätietodialogin käännösvirhe korjattiin. [Korjattu ajo 42176131959](https://github.com/Tenuxi/Uutishetki/actions/runs/42176131959) onnistui: 34 testiä, 0 virhettä, 0 ohitettua; Android Lint ja APK-käännös läpi. [Julkaisuajo 42176564380](https://github.com/Tenuxi/Uutishetki/actions/runs/42176564380) varmisti allekirjoituksen ja pakettimetatiedot. Laitetarkistuksia ei ajettu.
+
+## 0.5.0 — ennuste, päiväryhmät ja avaus
+
+Kohdennetut testit: puuttuvan/vanhan/nimenomaisen säävalinnan palautus, huominen/ylihuominen ja välimuistin palautus, puuttuvat ennustearvot ja väärät yksiköt; Suomen kesä-/talviajan päivärajat ja vaihtuvat Tänään/Eilen-otsikot; yhden avauksen kertasiirto, käyttäjän peruutus, artikkelista paluu, prosessin palautus selaimesta ja vanhan haun valmistuminen uuden avauksen aikana.
+
+Koodista tarkistettu: MainActivityn start/stop muodostaa avauskerran, ei jokaista resume-tapahtumaa. Ulos sovelluksesta avattu linkki merkitään ennen avausta ja merkki säilyy ViewModelissa sekä instanssin tallennustilassa. Sää/valikko ovat saman Activityn näkymiä. Avauksen haku säilyttää välimuistin ja odottaa jo käynnissä olevan haun mutexia; myöhempi päivitys ei anna uutta siirtolupaa. Käyttäjän vieritys peruu luvan nested-scroll-yhteydestä. Päiväotsikot ovat tavallisia LazyColumn-kohtia, eivät kiinteitä palkkeja.
+
+Laitteella testaamatta: todellinen selaimen/Custom Tabsin paluu, Home/viimeisimmät sovellukset, eleet haun aikana, näytön kääntö ja prosessin tappaminen selaimessa, TalkBack-vieritys, keskiyön ylitys avoimessa sovelluksessa, ennustedialogin vieritys ja suuret fontit. Ei emulaattoria tai paikallista Android-buildia.

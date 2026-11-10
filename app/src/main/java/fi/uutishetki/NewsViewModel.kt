@@ -8,6 +8,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class NewsViewModel(app: Application) : AndroidViewModel(app) {
+    val opening = OpeningPolicy()
+    val openingCompleted = MutableStateFlow(0L)
+    fun foreground() {
+        val generation = opening.started()
+        viewModelScope.launch {
+            repository.refresh(generation != null)
+            if (generation != null) openingCompleted.value = generation
+        }
+    }
     val repository = (app as NewsApplication).repository
     private val preferences = app.getSharedPreferences("filters", 0)
     private val selected = MutableStateFlow(SelectionCodec.decode(preferences.getString("selection", null)))

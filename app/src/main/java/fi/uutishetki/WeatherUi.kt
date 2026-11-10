@@ -66,6 +66,25 @@ fun WeatherDetails(state: WeatherUiState, automatic: Boolean, onSettings: () -> 
                     Text("Haettu ${formatDate(data.fetchedAt)}")
                 } else if (!state.loading && state.error == null) Text("Säätietoa ei vielä ole. Valitse sijainti sääasetuksista.")
                 Text(if (automatic) "Sää kohdistetaan saatavilla olevaan sijaintiin tai yllä nimettyyn varapaikkakuntaan." else "Sää kohdistetaan valitun paikkakunnan keskipisteeseen.")
+                HorizontalDivider()
+                Text("Kahden päivän ennuste", style = MaterialTheme.typography.titleMedium)
+                forecastDates(state.now).forEachIndexed { index, date ->
+                    val forecast = data?.forecast?.find { it.date == date }
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text("${if (index == 0) "Huomenna" else "Ylihuomenna"} · ${date.format(java.time.format.DateTimeFormatter.ofPattern("d.M.yyyy"))}", style = MaterialTheme.typography.titleSmall)
+                        if (forecast == null) Text(if (state.loading) "Haetaan ennustetta…" else "Ennuste ei saatavilla.")
+                        else {
+                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                WeatherIcon(forecast.code?.let { weatherSymbol(it, true) } ?: WeatherSymbol.UNKNOWN)
+                                Text(forecast.code?.let(::weatherDescription) ?: "Säätilan kuvaus ei saatavilla")
+                            }
+                            fun degrees(value: Double?) = value?.let { "${kotlin.math.round(it).toInt()}°" } ?: "ei saatavilla"
+                            Text("Alin ${degrees(forecast.low)} · ylin ${degrees(forecast.high)}")
+                            forecast.rain?.let { Text("Sateen todennäköisyys enimmillään $it %") }
+                            if (data?.isFresh(state.now) != true || state.error != null) Text("Aiempi ennuste – ajantasaisuutta ei voitu varmistaa.", color = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                }
                 Text("Sää on mallipohjainen arvio, ei paikallinen mittaus. Lämpötila on pyöristetty kokonaisasteiksi.")
                 WeatherAttribution()
             }

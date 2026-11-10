@@ -40,7 +40,7 @@ class WeatherViewModel(app: Application) : AndroidViewModel(app) {
     private val mutex = Mutex()
 
     fun hasLocationPermission() = location.hasPermission()
-    fun enabled(value: Boolean) = save(selected.value.copy(enabled = value))
+    fun enabled(value: Boolean) = save(selected.value.copy(enabled = value, visibilityExplicit = true))
     fun automatic() = save(selected.value.copy(automatic = true))
     fun manualMode() = save(selected.value.copy(automatic = false))
     fun choose(place: WeatherPlace) { save(selected.value.copy(automatic = false, manual = place)); found.value = PlaceSearch() }
@@ -80,7 +80,7 @@ class WeatherViewModel(app: Application) : AndroidViewModel(app) {
                 displayed.value = WeatherUiState(requestedPlace = place); lastAttempt = 0
             }
             val previous = displayed.value.data
-            if (previous != null && previous.isFresh(now) && now - previous.fetchedAt in 0 until WEATHER_INTERVAL) return
+            if (previous != null && previous.isFresh(now) && forecastDates(now).all { date -> previous.forecast.any { it.date == date } } && now - previous.fetchedAt in 0 until WEATHER_INTERVAL) return
             if (now - lastAttempt in 0 until WEATHER_RETRY) return
             lastAttempt = now
             displayed.value = displayed.value.copy(loading = true, error = null)

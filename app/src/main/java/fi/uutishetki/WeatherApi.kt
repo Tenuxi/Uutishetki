@@ -19,7 +19,9 @@ class WeatherApi(client: OkHttpClient) {
         val url = "https://api.open-meteo.com/v1/forecast".toHttpUrl().newBuilder()
             .addQueryParameter("latitude", rounded.latitude.toString()).addQueryParameter("longitude", rounded.longitude.toString())
             .addQueryParameter("current", "temperature_2m,weather_code,is_day")
-            .addQueryParameter("timeformat", "unixtime").addQueryParameter("timezone", "Europe/Helsinki").build()
+            .addQueryParameter("daily", "weather_code,temperature_2m_min,temperature_2m_max,precipitation_probability_max")
+            .addQueryParameter("forecast_days", "3")
+            .addQueryParameter("timeformat", "iso8601").addQueryParameter("timezone", "Europe/Helsinki").build()
         return WeatherParser.current(http.get(url.toString()), rounded, System.currentTimeMillis())
     }
     suspend fun search(query: String): List<WeatherPlace> {

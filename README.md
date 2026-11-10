@@ -1,6 +1,6 @@
 # Uutishetki
 
-Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.4.0**, versionCode **6**.
+Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.5.0**, versionCode **7**.
 
 Uutiset näkyvät uusimmat ensin yhteisessä virrassa. Lähdesuodatin ja pysyvä aiheiden monivalinta (oletuksena kaikki paitsi Urheilu), lyhyet RSS-kuvaukset, syötteen kuvat ja alkuperäisten artikkelien avaaminen Custom Tabsissa / selaimessa. Ei mainos-, analytiikka- tai AI-SDK:ita, tilejä eikä palvelinta. Julkaisijoiden sivujen mainoksia, evästeitä ja maksumuureja ei muuteta.
 
@@ -106,3 +106,7 @@ Hampurilainen avaa oikealta liukuvan paneelin, jossa Lehdet ja Aiheet ovat suora
 ## Sää ja lähialueen liikennetiedotteet (0.4.0)
 
 Uudella asennuksella Helsingin sää näkyy heti. Automaattinen sijainti vaihtaa sään käyttäjän lähelle luvan jälkeen; paikkakunnan voi valita käsin. Aiemmat asetukset säilyvät. Digitrafficin liikenteen häiriötiedotteet näkyvät punertavina kortteina uutisten joukossa; oletussäde 10 km. Ilman sijaintia tai omaa paikkakuntavalintaa liikennetiedotteet odottavat, eivät näytä Helsinkiä käyttäjän lähialueena. Sää ja liikenne voidaan kytkeä pois erikseen. Ei taustapaikannusta tai ilmoituksia. [Tietolähteet, käyttöehdot ja rajoitteet](docs/WEATHER_AND_ALERTS.md).
+
+## Version 0.5.0 täydennykset
+
+Säästä avautuu myös huomisen ja ylihuomisen ennuste. Uutisvirrassa on Suomen aikaan perustuvat päiväotsikot. Varsinainen avaus päivittää ja siirtää listan alkuun kerran, ellei käyttäjä aloita selaamista; artikkelista paluu säilyttää lukukohdan. Vanha tallennettu sään piilotusvalinta säilyy, puuttuva valinta tarkoittaa oletuksena näkyvää säätä.

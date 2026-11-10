@@ -1,5 +1,15 @@
 # Muutosloki
 
+## 0.5.0 – 10.11.2026
+
+- Sää näkyy oletuksena; automaattinen tila käyttää saatua sijaintia tai Helsinkiä. Käsivalintatilassa oma paikkakunta säilyy. Käyttäjän näkyvyysvalinta merkitään jatkossa erikseen. Puuttuva valinta otetaan käyttöön; vanha tallennettu piilotus säilytetään, koska aiemmat versiot eivät erottaneet sen alkuperää.
+- Säätiedoissa huomisen ja ylihuomisen ennuste: sääkuvake, kuvaus, alin/ylin lämpötila ja saatavilla oleva sateen todennäköisyys. Päivät lasketaan Suomen ajassa ja ennuste välimuistitetaan nykyisen sään mukana.
+- Varsinainen avaus päivittää uutiset välimuistin päälle ja siirtää listan alkuun kerran haun valmistuttua. Käyttäjän selaaminen tai sisältöjen avaaminen peruu siirron. Artikkelista, säästä tai valikosta palaaminen säilyttää lukukohdan.
+- Uutiset ja liikennetiedotteet samoissa päiväryhmissä: Tänään, Eilen ja d.M.yyyy. Otsikot päivittyvät vuorokauden vaihtuessa Europe/Helsinki-ajassa; tuntematonta julkaisuaikaa ei arvata.
+- Neutraali listatausta hieman tummemmaksi ja liikennetiedotteiden kortit vaaleanpunaisemmiksi. Korttien reunukset, pyöristykset ja kevyt varjo säilyvät.
+- Kohdennetut testit asetusten migraatiolle, ennustepäiville, päiväryhmille ja avaus-/artikkelipaluu-logiikalle. Actions-tulos kirjataan julkaisun jälkeen. Ei paikallista Android-buildia tai emulaattoria.
+- ApplicationId säilyy. Vanhaa allekirjoitusavainta ei ole tallessa; nykyinen hyväksytty testiallekirjoituspolku voi vaatia aiemman asennuksen poistamisen paikallisine tietoineen.
+
 ## 0.4.0 – 6.11.2026
 
 - Sää näkyy uudella asennuksella heti Helsingin säällä. Yläpalkissa paikkakunta, sääkuvake ja lämpötila tai lataustila.

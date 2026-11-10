@@ -42,3 +42,9 @@ Sääkoordinaatit ja paikannimihaku pyöristetään kahteen desimaaliin. Laittee
 ## Julkaisun rajoite
 
 Pysyvä applicationId säilyy. Aiemman julkaisun allekirjoitusavainta ei ole tallessa; nykyinen hyväksytty apk-tagityönkulku julkaisee CI:n testiallekirjoitetun APK:n. Avaimen säilymistä tai vanhan päälle asentumista ei voida luvata. Uusi asennus voi vaatia aiemman poistamisen, mikä poistaa paikalliset asetukset. Sovellus itse ei nollaa tallennettuja asetuksia päivityksessä.
+
+## 0.5.0 — ennuste ja asetusten migraatio (10.11.2026)
+
+Open-Meteon [daily-dokumentaatio](https://open-meteo.com/en/docs) ja todellinen HTTPS-vastaus tarkistettu: daily=weather_code,temperature_2m_min,temperature_2m_max,precipitation_probability_max, forecast_days=3, timezone=Europe/Helsinki, timeformat=iso8601. Nykyinen sää ja päiväennuste tulevat samalla pyynnöllä ja samaan viimeisen vastauksen välimuistiin. Huominen ja ylihuominen valitaan päivämäärällä, ei taulukon vakioindeksillä. Sateen todennäköisyys on vuorokauden enimmäisarvo. Puuttuva tai epäkelpo arvo jätetään pois tai merkitään puuttuvaksi; ennusteen virhe ei hävitä kelvollista nykyistä säätä. Vanheneminen ja lähdemerkinnät kuten nykyisessä säässä. Nykyhetken ISO-aika muunnetaan UTC:ksi vastauksen utc_offset_seconds-arvolla; päivät käsitellään Suomen aikavyöhykkeellä.
+
+Automaattisen tilan varapaikka on nyt aina Helsinki. Käsin valittu paikkakunta vaikuttaa käsivalintatilassa. Näkyvyyden valintaa seuraa visibilityExplicit-kenttä. Puuttuva näkyvyys tai erikseen ei-valituksi merkitty asetus ottaa sään käyttöön. Vanha enabled=false säilytetään: vanha tallennusmuoto ei kerro, syntyikö arvo valitsimesta vai muiden asetusten mukana, joten käyttäjän mahdollista piilotusvalintaa ei voi turvallisesti päätellä pois. Uudesta versiosta alkaen näkyvyysvalitsin tallentaa nimenomaisen valinnan, eivätkä sijaintivalinnat muuta sitä.

@@ -22,33 +22,35 @@ data class WeatherPlace(val name: String, val latitude: Double, val longitude: D
 }
 val HELSINKI = WeatherPlace("Helsinki", 60.17, 24.94)
 
-data class WeatherSettings(val enabled: Boolean = true, val automatic: Boolean = true, val manual: WeatherPlace? = null) {
-    fun weatherPlace(located: WeatherPlace?): WeatherPlace = if (automatic) located ?: manual ?: HELSINKI else manual ?: HELSINKI
+data class WeatherSettings(val enabled: Boolean = true, val automatic: Boolean = true, val manual: WeatherPlace? = null, val visibilityExplicit: Boolean = false) {
+    fun weatherPlace(located: WeatherPlace?): WeatherPlace = if (automatic) located ?: HELSINKI else manual ?: HELSINKI
     fun trafficPlace(located: WeatherPlace?): WeatherPlace? = if (automatic) located else manual
     fun encode(): String = JSONObject().put("enabled", enabled).put("automatic", automatic)
-        .put("manual", manual?.json() ?: JSONObject.NULL).toString()
+        .put("visibilityExplicit", visibilityExplicit).put("manual", manual?.json() ?: JSONObject.NULL).toString()
     companion object {
         fun decode(raw: String?): WeatherSettings = runCatching {
             val json = JSONObject(requireNotNull(raw))
-            WeatherSettings(json.getBoolean("enabled"), json.getBoolean("automatic"),
-                json.optJSONObject("manual")?.let(WeatherPlace::fromJson))
+            val explicit = json.optBoolean("visibilityExplicit", json.has("enabled"))
+            WeatherSettings(if (explicit) json.optBoolean("enabled", true) else true, json.optBoolean("automatic", true),
+                json.optJSONObject("manual")?.let(WeatherPlace::fromJson), explicit)
         }.getOrDefault(WeatherSettings())
     }
 }
 data class WeatherData(val place: WeatherPlace, val temperature: Double, val code: Int,
-    val isDay: Boolean, val observedAt: Long, val fetchedAt: Long) {
+    val isDay: Boolean, val observedAt: Long, val fetchedAt: Long, val forecast: List<DailyForecast> = emptyList()) {
     // Both clocks are checked: neither an old API observation nor an old cache looks current.
     fun isFresh(now: Long) = now - observedAt in 0..60 * MINUTE && now - fetchedAt in 0..30 * MINUTE
     val temperatureLabel: String get() = temperature.roundToInt().let { if (it > 0) "+$it°" else "$it°" }
     fun encode() = JSONObject().put("place", place.json()).put("temperature", temperature).put("code", code)
-        .put("day", isDay).put("observed", observedAt).put("fetched", fetchedAt).toString()
+        .put("day", isDay).put("observed", observedAt).put("fetched", fetchedAt)
+        .put("forecast", org.json.JSONArray(forecast.map { it.json() })).toString()
     companion object {
         fun decode(raw: String?): WeatherData? = runCatching {
             val j = JSONObject(requireNotNull(raw))
             val temp = j.getDouble("temperature")
             require(temp.isFinite() && temp in -100.0..70.0)
             WeatherData(WeatherPlace.fromJson(j.getJSONObject("place")), temp, j.getInt("code"), j.getBoolean("day"),
-                j.getLong("observed"), j.getLong("fetched"))
+                j.getLong("observed"), j.getLong("fetched"), decodeForecast(j.optJSONArray("forecast")))
         }.getOrNull()
     }
 }
@@ -61,16 +63,24 @@ object WeatherParser {
         val root = JSONObject(raw)
         require(!root.optBoolean("error"))
         val units = root.getJSONObject("current_units")
-        require(units.getString("temperature_2m") == "°C" && units.getString("time") == "unixtime")
+        require(units.getString("temperature_2m") == "°C")
         val current = root.getJSONObject("current")
         val temp = current.getDouble("temperature_2m")
         require(temp.isFinite() && temp in -100.0..70.0)
-        val seconds = current.getLong("time")
-        require(seconds in 1..Long.MAX_VALUE / 1000)
+        val observed = when (units.getString("time")) {
+            "unixtime" -> current.getLong("time").also { require(it in 1..Long.MAX_VALUE / 1000) } * 1000
+            "iso8601" -> {
+                require(root.getString("timezone") == "Europe/Helsinki")
+                val local = java.time.LocalDateTime.parse(current.getString("time"))
+                if (root.has("utc_offset_seconds")) local.atOffset(java.time.ZoneOffset.ofTotalSeconds(root.getInt("utc_offset_seconds"))).toInstant().toEpochMilli()
+                else local.atZone(HELSINKI_ZONE).toInstant().toEpochMilli()
+            }
+            else -> error("Tuntematon aikamuoto")
+        }
         val code = current.getInt("weather_code")
         val day = current.getInt("is_day")
         require(day in 0..1)
-        return WeatherData(place, temp, code, day == 1, seconds * 1000, now).also { require(it.isFresh(now)) }
+        return WeatherData(place, temp, code, day == 1, observed, now, parseDailyForecast(root)).also { require(it.isFresh(now)) }
     }
     fun places(raw: String): List<WeatherPlace> {
         val root = JSONObject(raw)

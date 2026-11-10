@@ -9,6 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -33,6 +34,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -59,8 +61,21 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
+    private val newsModel by lazy { androidx.lifecycle.ViewModelProvider(this)[NewsViewModel::class.java] }
+    override fun onStart() { super.onStart(); newsModel.foreground() }
+    override fun onStop() {
+        if (!isChangingConfigurations) newsModel.opening.stopped()
+        super.onStop()
+    }
+    fun externalLaunch() { newsModel.opening.externalLaunch() }
+    fun externalFailed() { newsModel.opening.externalFailed() }
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean("externalReturn", newsModel.opening.externalPending)
+        super.onSaveInstanceState(outState)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (savedInstanceState?.getBoolean("externalReturn") == true) newsModel.opening.restoreExternalReturn()
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT),
             navigationBarStyle = SystemBarStyle.light(0xFFF4F4F4.toInt(), 0xFF303030.toInt())
@@ -72,13 +87,13 @@ class MainActivity : ComponentActivity() {
                 secondary = Color(0xFF4D6072), onSecondary = Color.White,
                 secondaryContainer = Color(0xFFDCE6F0), onSecondaryContainer = Color(0xFF182D40),
                 tertiary = Color(0xFF4D6072),
-                background = Color(0xFFDEDEDE), surface = Color.White,
+                background = Color(0xFFD4D4D4), surface = Color.White,
                 onBackground = Color(0xFF171717), onSurface = Color(0xFF171717),
                 surfaceVariant = Color(0xFFE8E8E8), onSurfaceVariant = Color(0xFF494949),
                 surfaceContainer = Color(0xFFF3F3F3), surfaceContainerLow = Color(0xFFF7F7F7),
                 surfaceContainerHigh = Color(0xFFEEEEEE), surfaceContainerHighest = Color(0xFFE8E8E8),
                 outline = Color(0xFF777777), outlineVariant = Color(0xFFCCCCCC)
-            )) { NewsScreen() }
+            )) { NewsScreen(vm = newsModel) }
         }
     }
 }
@@ -114,11 +129,14 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
     val visible = remember(news, selection) { news.filtered(selection) }
     val nearby = if (trafficSettings.enabled && weatherSettings.trafficPlace(located) != null && trafficState.place == weatherSettings.trafficPlace(located) && trafficState.radius == trafficSettings.radius) trafficState.nearby else emptyList()
     val feed = remember(visible, nearby) { mergeFeed(visible, nearby) }
+    var today by remember { mutableStateOf(helsinkiDay(System.currentTimeMillis())) }
+    val dayGroups = remember(feed) { groupFeedDays(feed) }
+    val openingCompleted by vm.openingCompleted.collectAsStateWithLifecycle()
     val active = source != null || selection.topics != Topic.entries.toSet()
     var about by rememberSaveable { mutableStateOf(false) }
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    val openDrawer: () -> Unit = { scope.launch { drawerState.open() } }
+    val openDrawer: () -> Unit = { vm.opening.userInteracted(); scope.launch { drawerState.open() } }
     val density = LocalDensity.current
     val safePadding = WindowInsets.safeDrawing.asPaddingValues()
     val initialHeaderHeight = safePadding.calculateTopPadding() + 56.dp
@@ -127,11 +145,29 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
     val refreshState = rememberPullToRefreshState()
     val listState = rememberLazyListState()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    DisposableEffect(lifecycle) {
-        val observer = LifecycleEventObserver { _, event -> if (event == Lifecycle.Event.ON_START) vm.refresh() }
-        lifecycle.addObserver(observer)
-        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) vm.refresh()
-        onDispose { lifecycle.removeObserver(observer) }
+    LaunchedEffect(lifecycle) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            while (isActive) {
+                today = helsinkiDay(System.currentTimeMillis())
+                val next = today.plusDays(1).atStartOfDay(HELSINKI_ZONE).toInstant().toEpochMilli()
+                delay((next - System.currentTimeMillis()).coerceIn(1, 60_000))
+            }
+        }
+    }
+    LaunchedEffect(openingCompleted) {
+        if (openingCompleted > 0) {
+            snapshotFlow { news == vm.repository.news.value }.first { it }
+            withFrameNanos { }
+            if (vm.opening.consumeScroll(openingCompleted)) listState.scrollToItem(0)
+        }
+    }
+    val readingScroll = remember(vm) {
+        object : androidx.compose.ui.input.nestedscroll.NestedScrollConnection {
+            override fun onPreScroll(available: androidx.compose.ui.geometry.Offset, source: androidx.compose.ui.input.nestedscroll.NestedScrollSource): androidx.compose.ui.geometry.Offset {
+                if (source == androidx.compose.ui.input.nestedscroll.NestedScrollSource.UserInput) vm.opening.userInteracted()
+                return androidx.compose.ui.geometry.Offset.Zero
+            }
+        }
     }
     LaunchedEffect(lifecycle, weather) {
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -159,7 +195,10 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
             }
         }
     }
-    LaunchedEffect(selection) { listState.scrollToItem(0) }
+    var previousSelection by remember { mutableStateOf(selection) }
+    LaunchedEffect(selection) {
+        if (selection != previousSelection) { vm.opening.userInteracted(); listState.scrollToItem(0); previousSelection = selection }
+    }
     RightFilterDrawer(weather = weather, traffic = traffic, onAutomaticWeather = automaticWeather, drawerState = drawerState, selection = selection, updated = updated,
         onSource = vm::source, onTopic = vm::toggle, onAllTopics = vm::allTopics,
         onDefaults = vm::defaults, onAbout = { scope.launch { drawerState.close(); about = true } }) {
@@ -171,7 +210,7 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
                 PullToRefreshDefaults.Indicator(state = refreshState, isRefreshing = refreshing,
                     modifier = Modifier.align(Alignment.TopCenter).padding(top = headerHeight))
             }) {
-            LazyColumn(state = listState, modifier = Modifier.fillMaxSize(),
+            LazyColumn(state = listState, modifier = Modifier.fillMaxSize().nestedScroll(readingScroll),
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp,
                     top = headerHeight + 8.dp, bottom = safePadding.calculateBottomPadding() + 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -203,10 +242,18 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
                         }
                     }
                 }
-                items(feed, key = { it.key }) { entry ->
-                    when (entry) {
-                        is FeedEntry.Article -> NewsCard(entry.news)
-                        is FeedEntry.Traffic -> TrafficCard(entry.item, trafficState.checkedAt)
+                dayGroups.forEach { group ->
+                    item(key = "day:${group.date}") {
+                        Column(Modifier.fillMaxWidth().padding(top = 6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text(dayLabel(group.date, today), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                        }
+                    }
+                    items(group.entries, key = { it.key }) { entry ->
+                        when (entry) {
+                            is FeedEntry.Article -> NewsCard(entry.news)
+                            is FeedEntry.Traffic -> TrafficCard(entry.item, trafficState.checkedAt, onOpen = { vm.opening.userInteracted() })
+                        }
                     }
                 }
                 item(key = "footer") { Text("Otsikot ja sisällöt kuuluvat uutislähteille.\nKoko artikkeli avautuu julkaisijan sivulla.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
@@ -221,7 +268,7 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
                     Text("Uutishetki", modifier = Modifier.weight(1f), fontFamily = brandFont,
                         style = MaterialTheme.typography.titleLarge, color = Color.Black,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    if (weatherSettings.enabled) WeatherButton(weatherState) { weatherDetails = true }
+                    if (weatherSettings.enabled) WeatherButton(weatherState) { vm.opening.userInteracted(); weatherDetails = true }
                     IconButton(onClick = openDrawer, modifier = Modifier.size(48.dp)) {
                         Icon(painterResource(R.drawable.ic_menu), contentDescription = "Avaa valikko", tint = Color.Black)
                     }
@@ -268,10 +315,14 @@ private fun NewsCard(news: News) {
     }
 }
 internal fun openArticle(context: Context, url: String) {
+    var base = context
+    while (base is android.content.ContextWrapper && base !is MainActivity) base = base.baseContext
+    val activity = base as? MainActivity
+    activity?.externalLaunch()
     val uri = Uri.parse(url)
     try { CustomTabsIntent.Builder().setShowTitle(true).build().launchUrl(context, uri) }
     catch (_: ActivityNotFoundException) {
         try { context.startActivity(Intent(Intent.ACTION_VIEW, uri)) }
-        catch (_: ActivityNotFoundException) { Toast.makeText(context, "Asenna selain artikkelin avaamiseksi.", Toast.LENGTH_LONG).show() }
+        catch (_: ActivityNotFoundException) { activity?.externalFailed(); Toast.makeText(context, "Asenna selain artikkelin avaamiseksi.", Toast.LENGTH_LONG).show() }
     }
 }

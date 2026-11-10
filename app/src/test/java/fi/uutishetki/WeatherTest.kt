@@ -15,7 +15,7 @@ class WeatherTest {
         for (automatic in listOf(false, true)) {
             val settings = WeatherSettings(true, automatic, place)
             assertEquals(settings, WeatherSettings.decode(settings.encode()))
-            assertEquals(settings.copy(enabled = false), WeatherSettings.decode(settings.copy(enabled = false).encode()))
+            assertEquals(settings.copy(enabled = false, visibilityExplicit = true), WeatherSettings.decode(settings.copy(enabled = false, visibilityExplicit = true).encode()))
         }
     }
     @Test fun fallbackWeatherNeverBecomesTrafficLocation() {
@@ -30,7 +30,7 @@ class WeatherTest {
         assertEquals(place, manual.weatherPlace(HELSINKI))
         assertEquals(place, manual.trafficPlace(HELSINKI))
         assertEquals(place, manual.weatherPlace(null))
-        assertEquals(place, settings.copy(manual = place).weatherPlace(null))
+        assertEquals(HELSINKI, settings.copy(manual = place).weatherPlace(null))
         assertNull(settings.copy(manual = place).trafficPlace(null))
     }
     @Test fun previousExplicitOffAndManualChoicesSurviveUpgrade() {

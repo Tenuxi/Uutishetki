@@ -44,7 +44,7 @@ class NewsRepository(app: Application, private val client: OkHttpClient) {
     private var lastAttempt = 0L
 
     suspend fun refresh(force: Boolean = false) {
-        if (!refreshMutex.tryLock()) return
+        refreshMutex.lock()
         try {
             withContext(Dispatchers.IO) {
                 if (!loaded) {
@@ -63,7 +63,7 @@ class NewsRepository(app: Application, private val client: OkHttpClient) {
                         try {
                             val request = Request.Builder().url(feed.url)
                                 .header("User-Agent", "Uutishetki/${BuildConfig.VERSION_NAME} (personal RSS reader)")
-                                .header("Cache-Control", "max-age=300").build()
+                                .header("Cache-Control", if (force) "max-age=0" else "max-age=300").build()
                             val items = client.newCall(request).execute().use { response ->
                                 if (!response.isSuccessful) throw IOException("HTTP ${response.code}")
                                 val body = response.body ?: throw IOException("Tyhjä vastaus")
