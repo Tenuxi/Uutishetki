@@ -7,7 +7,7 @@
 - Varsinainen avaus päivittää uutiset välimuistin päälle ja siirtää listan alkuun kerran haun valmistuttua. Käyttäjän selaaminen tai sisältöjen avaaminen peruu siirron. Artikkelista, säästä tai valikosta palaaminen säilyttää lukukohdan.
 - Uutiset ja liikennetiedotteet samoissa päiväryhmissä: Tänään, Eilen ja d.M.yyyy. Otsikot päivittyvät vuorokauden vaihtuessa Europe/Helsinki-ajassa; tuntematonta julkaisuaikaa ei arvata.
 - Neutraali listatausta hieman tummemmaksi ja liikennetiedotteiden kortit vaaleanpunaisemmiksi. Korttien reunukset, pyöristykset ja kevyt varjo säilyvät.
-- Kohdennetut testit asetusten migraatiolle, ennustepäiville, päiväryhmille ja avaus-/artikkelipaluu-logiikalle. Actions-tulos kirjataan julkaisun jälkeen. Ei paikallista Android-buildia tai emulaattoria.
+- Kohdennetut testit asetusten migraatiolle, ennustepäiville, päiväryhmille ja avaus-/artikkelipaluu-logiikalle. [Actions 42770435779](https://github.com/Tenuxi/Uutishetki/actions/runs/42770435779) läpäisi kaikki 44 testiä, Android Lintin ja APK-käännöksen. [Julkaisu 42770826633](https://github.com/Tenuxi/Uutishetki/actions/runs/42770826633) varmisti allekirjoituksen, applicationId:n, version 0.5.0 ja versionCoden 7. [Lataa APK](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.5.0/Uutishetki-0.5.0.apk). Ei paikallista Android-buildia tai emulaattoria.
 - ApplicationId säilyy. Vanhaa allekirjoitusavainta ei ole tallessa; nykyinen hyväksytty testiallekirjoituspolku voi vaatia aiemman asennuksen poistamisen paikallisine tietoineen.
 
 ## 0.4.0 – 6.11.2026
