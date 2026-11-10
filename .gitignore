@@ -9,3 +9,11 @@ local.properties
 *.aab
 *.hprof
 .DS_Store
+
+# Private signing material must stay outside the repository.
+*.key
+*.pfx
+.signing/
+credentials.json
+__pycache__/
+*.pyc

@@ -1,12 +1,12 @@
-name: Julkaise asennettava APK
+name: Julkaise allekirjoitettu release-APK
 on:
   push:
-    tags: ['apk-*']
+    tags: ['apk-*', 'v*']
 permissions:
   actions: read
   contents: write
 concurrency:
-  group: publish-${{ github.ref }}
+  group: uutishetki-release
   cancel-in-progress: false
 jobs:
   publish:
@@ -15,30 +15,61 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - name: Tarkista versio ja nouda saman commitin hyväksytty APK
+      - name: Tarkista julkaisutagi ja kasvava versionCode
+        run: python3 scripts/release_notes.py --tag "$GITHUB_REF_NAME" --output release-notes.md
+      - name: Vaadi saman commitin onnistunut main-tarkistus
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          python3 scripts/release_notes.py --tag "$GITHUB_REF_NAME" --output release-notes.md
           run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow android.yml --commit "$GITHUB_SHA" --branch main --status success --json databaseId --jq '.[0].databaseId')
           if [ -z "$run_id" ] || [ "$run_id" = null ]; then
-            echo '::error::Tälle commitille ei ole onnistunutta main-haaran Android-tarkistusta. Odota tarkistus ja aja tämä työ uudelleen.'
+            echo '::error::Tälle commitille ei ole onnistunutta main-haaran Android-tarkistusta.'
             exit 1
           fi
-          gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name Uutishetki-debug-ei-julkaisu --dir downloaded
-          version="${GITHUB_REF_NAME#apk-}"
-          cp downloaded/app-debug.apk "Uutishetki-$version.apk"
-      - name: Varmenna paketti ja julkaise
+      - name: Vaadi kaikki pysyvät allekirjoitussalaisuudet
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: python3 scripts/prepare_signing.py
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Varmenna keystoren julkinen varmenne ennen käännöstä
+        env:
+          SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          keytool -exportcert -keystore "$RUNNER_TEMP/uutishetki-release.p12" -storetype PKCS12 -storepass:env SIGNING_STORE_PASSWORD -alias "$SIGNING_KEY_ALIAS" -file "$RUNNER_TEMP/release-cert.der"
+          expected=$(tr -d '\r\n' < config/release-certificate-sha256.txt)
+          actual=$(sha256sum "$RUNNER_TEMP/release-cert.der" | cut -d ' ' -f 1)
+          test "$actual" = "$expected" || { echo '::error::Keystoren varmenne ei vastaa lukittua julkaisuvarmennetta.'; exit 1; }
+      - name: Rakenna release-APK pysyvällä avaimella
+        env:
+          SIGNING_KEYSTORE_PATH: ${{ runner.temp }}/uutishetki-release.p12
+          SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: ./gradlew assembleRelease --no-daemon --no-configuration-cache
+      - name: Varmenna release-APK ja julkaise
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          version="${GITHUB_REF_NAME#apk-}"
+          version=$(sed -n 's/^versionName=//p' version.properties)
           apk="Uutishetki-$version.apk"
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$apk"
+          cp app/build/outputs/apk/release/app-release.apk "$apk"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$apk" > apk-certificate.txt
+          python3 scripts/verify_signature.py apk-certificate.txt
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$apk" > apk-metadata.txt
           python3 scripts/verify_apk.py apk-metadata.txt
           sha256sum "$apk" > "$apk.sha256"
-          printf '\nAsennettava APK on testiallekirjoitettu debug-versio, kuten 0.1.0. Eri allekirjoituksen vuoksi aiempi sovellus voi vaatia poistamisen ennen asennusta; poistaminen hävittää paikallisen datan ja valinnat. Tavallinen saman avaimen päivitys ja uutisten päivitys säilyttävät valinnat. Laitetestausta ei ole tehty.\n' >> release-notes.md
           gh release create "$GITHUB_REF_NAME" "$apk" "$apk.sha256" --verify-tag --title "Uutishetki $version" --notes-file release-notes.md
+      - name: Poista runnerin väliaikainen avainkopio
+        if: always()
+        run: rm -f "$RUNNER_TEMP/uutishetki-release.p12" "$RUNNER_TEMP/release-cert.der"

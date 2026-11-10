@@ -63,3 +63,9 @@ Koodista tarkistettu: MainActivityn start/stop muodostaa avauskerran, ei jokaist
 Laitteella testaamatta: todellinen selaimen/Custom Tabsin paluu, Home/viimeisimmät sovellukset, eleet haun aikana, näytön kääntö ja prosessin tappaminen selaimessa, TalkBack-vieritys, keskiyön ylitys avoimessa sovelluksessa, ennustedialogin vieritys ja suuret fontit. Ei emulaattoria tai paikallista Android-buildia.
 
 0.5.0:n tulos: [Actions 42770435779](https://github.com/Tenuxi/Uutishetki/actions/runs/42770435779) läpäisi 44 testiä, 0 virhettä ja 0 ohitettua (3 uutta ennustetestiä ja 7 avaus-/päiväryhmätestiä). Android Lint ja APK-käännös onnistuivat. [Julkaisu 42770826633](https://github.com/Tenuxi/Uutishetki/actions/runs/42770826633) varmisti allekirjoituksen ja pakettimetatiedot. Laitetarkistuksia ei ajettu.
+
+## 0.5.1 — pysyvä allekirjoitus
+
+Aiemmista 0.2.0-, 0.4.0- ja 0.5.0-julkaisuista luettu APK v2 -lohkon varmenteet ja binäärisen manifestin package/versionCode/versionName/debuggable. Eri debug-varmenteet varmistettu, applicationId sama ja versionCode kasvava. Paikallinen debug-varmenne ei vastannut niitä.
+
+Kolme kohdennettua Python-testiä: salaisuuksien puuttuminen, väärä alias/base64, puuttuva/väärä/ylimääräinen varmenne sekä debug- tai väärän sovelluksen/version APK hylätään. Positiiviset tapaukset hyväksytään. YAML-jäsennys ja julkaisumetatiedot tarkistettu paikallisesti. Varsinainen APK rakennetaan Actionsissa, ei paikallisesti. Fyysistä päivitysasennusta tai tietojen säilymistä laitteella ei ole testattu.

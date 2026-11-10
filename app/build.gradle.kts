@@ -18,6 +18,7 @@ android {
     }
     signingConfigs {
         create("release") {
+            storeType = "PKCS12"
             System.getenv("SIGNING_KEYSTORE_PATH")?.let { storeFile = file(it) }
             storePassword = System.getenv("SIGNING_STORE_PASSWORD")
             keyAlias = System.getenv("SIGNING_KEY_ALIAS")
@@ -27,6 +28,7 @@ android {
     buildTypes {
         release {
             signingConfig = signingConfigs.getByName("release")
+            isDebuggable = false
             isMinifyEnabled = false
         }
     }
@@ -50,4 +52,18 @@ dependencies {
     implementation("org.jsoup:jsoup:1.18.3")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.json:json:20240303")
+}
+
+// Fail closed even when assembleRelease is invoked outside GitHub Actions.
+tasks.configureEach {
+    if (name == "validateSigningRelease") {
+        doFirst {
+            val required = listOf("SIGNING_KEYSTORE_PATH", "SIGNING_STORE_PASSWORD", "SIGNING_KEY_ALIAS", "SIGNING_KEY_PASSWORD")
+            require(required.all { !System.getenv(it).isNullOrBlank() }) {
+                "Release-allekirjoituksen asetuksia puuttuu. Debug-varavaihtoehtoa ei käytetä."
+            }
+            require(System.getenv("SIGNING_KEY_ALIAS") == "uutishetki-release") { "Väärä julkaisuavainalias." }
+            require(file(System.getenv("SIGNING_KEYSTORE_PATH")).isFile) { "Pysyvä release-keystore puuttuu." }
+        }
+    }
 }
