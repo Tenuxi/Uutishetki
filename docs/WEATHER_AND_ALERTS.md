@@ -39,9 +39,9 @@ Vain ACCESS_COARSE_LOCATION, ei tarkkaa tai taustasijaintilupaa. Kertapaikannus 
 
 Sääkoordinaatit ja paikannimihaku pyöristetään kahteen desimaaliin. Laitteen Geocoder hakee paikannimen parhaansa mukaan; nimeä ei keksitä. Open-Meteo saa pyynnön koordinaatit/paikannimen ja IP-osoitteen; sen ehtojen palvelinlokien säilytys on enintään 90 päivää. Sääasiakkaan koordinaatti-URL:eja ei tallenneta HTTP-levyvälimuistiin. Digitraffic saa IP-osoitteen ja sovellustunnisteen mutta ei käyttäjän sijaintia. Uutistoiminnot eivät odota sää-, paikannus- tai liikennepyyntöjä.
 
-## Julkaisun rajoite
+## Julkaisun allekirjoitus
 
-Pysyvä applicationId säilyy. Aiemman julkaisun allekirjoitusavainta ei ole tallessa; nykyinen hyväksytty apk-tagityönkulku julkaisee CI:n testiallekirjoitetun APK:n. Avaimen säilymistä tai vanhan päälle asentumista ei voida luvata. Uusi asennus voi vaatia aiemman poistamisen, mikä poistaa paikalliset asetukset. Sovellus itse ei nollaa tallennettuja asetuksia päivityksessä.
+Versiosta 0.5.1 alkaen julkaisut käyttävät pysyvää release-keystorea ja lukittua SHA-256-varmennetta. Vanhoista debug-asennuksista siirtyminen vaatii kertaluonteisen poistamisen paikallisine tietoineen. Sen jälkeen sama avain ja kasvava versionCode tukevat päivitysasennuksia. [Allekirjoituksen selvitys, Secrets ja varmuuskopiointi](SIGNING.md).
 
 ## 0.5.0 — ennuste ja asetusten migraatio (10.11.2026)
 

@@ -1,13 +1,13 @@
 # Muutosloki
 
-## 0.5.1 – 10.11.2026
+## 0.5.1 – 11.11.2026
 
 - Korjattu APK-julkaisujen vaihtuva allekirjoitus: aiemmat apk-tagit julkaisivat runnerin eri debug-avaimilla allekirjoittamia kehitys-APK:ita. Tarkistetuissa 0.2.0-, 0.4.0- ja 0.5.0-APK:issa applicationId oli sama ja versionCode kasvoi, mutta varmenteet erosivat.
 - Luotu yksi pysyvä RSA-3072 release-keystore repon ulkopuolelle. Secrets-pohjainen julkaisu käyttää aina samaa avainta ja aliasta; avainta ei luoda buildissa.
 - Yksi yhteinen julkaisureitti apk- ja v-tageille: assembleRelease, ei debug-APK:n noutoa. Puuttuvat salaisuudet, väärä alias/varmenne, debug-paketti tai väärä sovellus/versio keskeyttävät julkaisun.
 - Lukittu julkisen varmenteen SHA-256 ja tarkistus sekä keystorelle että valmiille APK:lle. Turvallinen Secrets-siirtoskripti sekä [varmuuskopiointi- ja palautusohje](docs/SIGNING.md).
 - **Kertasiirtymä:** vanha debug-avaimella asennettu sovellus täytyy poistaa ennen uuden release-APK:n asentamista. Poistaminen poistaa paikalliset tiedot ja asetukset. Tämä uusi avain ei päivitä vanhan eri avaimen asennuksen päälle. Tulevat saman avaimen ja suuremman versionCoden julkaisut tukevat päivitysasennusta.
-- Kohdennetut tarkistukset varmenteelle, puuttuville salaisuuksille, applicationId:lle, versionCode:lle ja ei-debug-tilalle. [Actions 42772338669](https://github.com/Tenuxi/Uutishetki/actions/runs/42772338669) onnistui: kolme julkaisusuojauksen testiä, nykyiset Android-testit, Android Lint ja koekäännös. Keystoren ja paikallisen varakopion varmenteet ja 0600-oikeudet tarkistettu. Release-APK:n julkaisu odottaa GitHub CLI -kirjautumista ja Secrets-asetuksia; uutta APK:ta ei vielä julkaistu. Ei paikallista Android-buildia tai laite-/emulaattoritestiä.
+- Kohdennetut tarkistukset varmenteelle, puuttuville salaisuuksille, applicationId:lle, versionCode:lle ja ei-debug-tilalle. [Actions 42772338669](https://github.com/Tenuxi/Uutishetki/actions/runs/42772338669) onnistui: kolme julkaisusuojauksen testiä, nykyiset Android-testit, Android Lint ja koekäännös. Keystoren ja paikallisen varakopion varmenteet ja 0600-oikeudet tarkistettu. Neljä pysyvän allekirjoituksen salaisuutta tallennettu GitHub Actions Secretsiin. [Release-julkaisu 42976338371](https://github.com/Tenuxi/Uutishetki/actions/runs/42976338371) onnistui: keystoren ja APK:n varmenne, applicationId, version 0.5.1 / versionCode 8 ja ei-debug-tila varmennettu. Myös Releasesista ladatun APK:n varmenne, metatiedot ja tiedostotiiviste tarkistettu. [Lataa APK](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.5.1/Uutishetki-0.5.1.apk). Ei paikallista Android-buildia tai laite-/emulaattoritestiä.
 
 ## 0.5.0 – 10.11.2026
 
