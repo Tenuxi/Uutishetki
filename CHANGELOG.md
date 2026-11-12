@@ -1,5 +1,14 @@
 # Muutosloki
 
+## 0.6.0 — 12.11.2026
+
+- Lisätty Stara ja Pelaaja lehtivalintoihin. Staran aiheet tulevat kategorioista, Pelaajan pelisyöte kuuluu Digiin. Kaikki-valinta sisältää uudet lehdet; aiemmat rajaukset säilyvät.
+- Uusi graafinen sääpaneeli: paikkakunta ja sijainnin alkuperä, suurempi sääkuvake ja lämpötila sekä huomisen ja ylihuomisen ennustekortit. Kortit pinoutuvat pienellä näytöllä tai suurella tekstikoolla.
+- Säätiedon ajankohta näkyy tiiviisti; tekniset lisätiedot ovat avattavassa osiossa. Sadeprosentti säilyttää merkityksensä päivän suurimpana tuntikohtaisena todennäköisyytenä.
+- Sijainnin alkuperä tallentuu säävälimuistiin. Vanha välimuisti ilman alkuperätietoa haetaan kerran uudelleen; käyttäjän asetuksia ei muuteta.
+- Sama applicationId ja pysyvä release-varmenne kuin versiossa 0.5.1; versionCode 9.
+
+
 ## 0.5.1 – 11.11.2026
 
 - Korjattu APK-julkaisujen vaihtuva allekirjoitus: aiemmat apk-tagit julkaisivat runnerin eri debug-avaimilla allekirjoittamia kehitys-APK:ita. Tarkistetuissa 0.2.0-, 0.4.0- ja 0.5.0-APK:issa applicationId oli sama ja versionCode kasvoi, mutta varmenteet erosivat.

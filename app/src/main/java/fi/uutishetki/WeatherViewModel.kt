@@ -30,8 +30,9 @@ class WeatherViewModel(app: Application) : AndroidViewModel(app) {
     }
     private val location = ForegroundLocation(app)
     private val api = WeatherApi((app as NewsApplication).client)
-    private val storedData = WeatherData.decode(preferences.getString("latest", null))
-    private val displayed = MutableStateFlow(WeatherUiState(data = storedData, requestedPlace = storedData?.place ?: selected.value.weatherPlace(null)))
+    private val storedData = WeatherData.decode(preferences.getString("latest", null))?.takeIf { it.origin != null }
+    private val displayed = MutableStateFlow(WeatherUiState(data = storedData, requestedPlace = storedData?.place ?: selected.value.weatherPlace(null),
+        origin = storedData?.origin ?: selected.value.origin(null)))
     val state = displayed.asStateFlow()
     private val found = MutableStateFlow(PlaceSearch())
     val search = found.asStateFlow()
@@ -47,7 +48,7 @@ class WeatherViewModel(app: Application) : AndroidViewModel(app) {
     fun permissionDenied() { permissionExplained(); located.value = null; refreshToken.value++ }
     private fun save(value: WeatherSettings) {
         preferences.edit().putString("settings", value.encode()).remove("latest").apply()
-        displayed.value = WeatherUiState()
+        displayed.value = WeatherUiState(requestedPlace = value.weatherPlace(null), origin = value.origin(null))
         lastAttempt = 0
         located.value = null
         selected.value = value
@@ -75,20 +76,22 @@ class WeatherViewModel(app: Application) : AndroidViewModel(app) {
             val now = System.currentTimeMillis()
             displayed.value = displayed.value.copy(now = now)
             if (!config.enabled) return
-            val place = config.weatherPlace(located.value).rounded()
-            if (displayed.value.requestedPlace != place || (displayed.value.data != null && displayed.value.data?.place != place)) {
-                displayed.value = WeatherUiState(requestedPlace = place); lastAttempt = 0
+            val locationSnapshot = located.value
+            val place = config.weatherPlace(locationSnapshot).rounded()
+            val origin = config.origin(locationSnapshot)
+            if (displayed.value.origin != origin || displayed.value.requestedPlace != place || (displayed.value.data != null && displayed.value.data?.place != place)) {
+                displayed.value = WeatherUiState(requestedPlace = place, origin = origin); lastAttempt = 0
             }
             val previous = displayed.value.data
             if (previous != null && previous.isFresh(now) && forecastDates(now).all { date -> previous.forecast.any { it.date == date } } && now - previous.fetchedAt in 0 until WEATHER_INTERVAL) return
             if (now - lastAttempt in 0 until WEATHER_RETRY) return
             lastAttempt = now
             displayed.value = displayed.value.copy(loading = true, error = null)
-            val data = api.weather(place)
+            val data = api.weather(place).copy(origin = origin)
             ensureActiveContext()
             if (config == selected.value) {
                 preferences.edit().putString("latest", data.encode()).apply()
-                displayed.value = WeatherUiState(data = data, requestedPlace = place)
+                displayed.value = WeatherUiState(data = data, requestedPlace = place, origin = origin)
             }
         } catch (e: CancellationException) {
             // Retry when returning to the foreground instead of waiting after an interrupted request.

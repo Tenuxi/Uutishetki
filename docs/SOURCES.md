@@ -52,3 +52,19 @@ Seitsemän syötettä haetaan rinnakkain. Jokainen syöte tallentuu itsenäisest
 Aiheiden monivalinta käyttää OR-ehtoa, lähde yhdistetään AND-ehdolla. Poikkeus: Urheilu toimii nimenomaisena poisrajauksena, kun sitä ei ole valittu, myös moniaiheiselle uutiselle. Luokittelemattomat näytetään oletuksilla (kaikki paitsi urheilu) tai kaikilla aiheilla. Tyhjä aihejoukko ei näytä mitään. Valitse kaikki koskee aiheita; Palauta oletukset palauttaa lisäksi lähteeksi Kaikki. Molemmat valinnat tallennetaan sovelluksen omiin SharedPreferences-asetuksiin, erilleen uutispäivityksen tilasta. 0.1.0:ssa ei ollut käynnistysten välillä pysyvää aihevalintaa, joten 0.2.0 ottaa ensi kertaa oletukset käyttöön.
 
 Urheiluun lisättiin havaittuja metatietoja sm-liiga, nba, maastohiihto, mestarien liiga, muutlajit, talviurheilu ja esports; viihteeseen viihdeuutiset. Kartoituksen ajantasainen kokonaisuus on `Topic.aliases`-koodissa.
+
+
+## Stara ja Pelaaja — 0.6.0, tarkistus 12.11.2026
+
+| Lähde | Virallinen sivusto ja syöte | Tarkistettu metadata |
+| --- | --- | --- |
+| Stara | [stara.fi](https://www.stara.fi/), [RSS](https://feeds.feedburner.com/stara) | HTTP 200, 30 itemiä: title, link, vakaa guid, pubDate (RFC 1123), HTML-description ja useita category-kenttiä. Ei enclosure/media-kuvia. |
+| Pelaaja | [pelaaja.fi](https://www.pelaaja.fi/), [RSS](https://www.pelaaja.fi/feed/) | HTTP 200, 10 itemiä: title, link, vakaa guid (post_type=uutiset), pubDate (RFC 1123), HTML-description. Ei category- eikä enclosure/media-kuvakenttiä. content:encoded sisältää artikkelitekstiä, jota ei käytetä. |
+
+Staran nykyisen etusivun RSS-linkki ja [virallinen RSS-ohje](https://www.stara.fi/2005/06/23/rss-otsikot/) osoittavat FeedBurner-syötteeseen. Ohje tarjoaa otsikot RSS-lukijoihin; se ei anna yleistä kuvien tai kokotekstien uudelleenjulkaisulupaa. Pelaajan etusivun RSS-linkki osoittaa `/feed/`-osoitteeseen. Sivusto esittelee itsensä pelimediaksi ja syötteen tarkistettu sisältö on peliuutisia. Pelaajan erillisiä RSS-käyttöehtoja tai yleistä uudelleenjulkaisulisenssiä ei löytynyt tarkistuksessa: ehdot jäävät tältä osin epävarmoiksi. Tämä on henkilökohtainen RSS-lukija, ei kokotekstien uudelleenjulkaisupalvelu. Molempien lähde ja alkuperäislinkki näkyvät korteissa, eikä kuvia haeta artikkelisivuilta.
+
+Stara: `Viihdeuutiset` kuuluu olemassa olevaan Viihde-kartoitukseen; sivuston kategoriat `Elokuvat`, `DVD` ja `StaraTV Viihde` kartoitetaan lähdekohtaisesti Viihteeseen, `Digi` Digiin. Nykyiset yleiskategoriat (esimerkiksi Urheilu) toimivat ennallaan. `Uutiset`, `Kuumaa`, `Matkailu`, `Terveys` ja henkilönnimet eivät yksin anna aihetta. Kaikkia Staran uutisia ei luokitella viihteeksi.
+
+Pelaajan nimenomaisesti varmennettu pelisyöte saa Digi-aiheen syötekohtaisena kartoituksena, kuten nykyiset Bitti/Digitoday-syötteet. Kategoriaa ei päätellä otsikosta eikä muiden aiheiden puuttumisesta. Syötteen mahdollinen sisällön rajauksen muutos vaatii kartoituksen uuden tarkistuksen.
+
+Uudet lähteet käyttävät samoja puuttuvan kuvan/kuvauksen vararatkaisuja, 180 merkin teaseria, julkaisuajan jäsennystä ja lähde+GUID-kaksoiskappaleiden estoa. Yhteensä seitsemän lehteä ja yhdeksän syötettä. Tallennettu `source=null` (Kaikki) kattaa uudet enum-arvot automaattisesti; rajattu lähde säilyy muuttumattomana.

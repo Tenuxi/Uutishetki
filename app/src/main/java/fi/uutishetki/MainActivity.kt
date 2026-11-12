@@ -283,14 +283,14 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
         text = { Text("Sijaintia käytetään paikalliseen säähän ja lähialueen liikennetiedotteisiin vain sovellusta käyttäessäsi. Sijaintihistoriaa ei tallenneta. Ilman lupaa näytämme Helsingin sään; voit myös valita paikkakunnan käsin. Open-Meteo saa sään koordinaatit ja IP-osoitteen.") },
         confirmButton = { TextButton(onClick = { weather.permissionExplained(); automaticWeather() }) { Text("Jatka sijaintilupaan") } },
         dismissButton = { TextButton(onClick = { weather.permissionExplained() }) { Text("Ei nyt") } })
-    if (weatherDetails) WeatherDetails(weatherState, weatherSettings.automatic,
+    if (weatherDetails) WeatherDetails(weatherState,
         onSettings = { weatherDetails = false; openDrawer() }, onDismiss = { weatherDetails = false })
     if (about) AlertDialog(onDismissRequest = { about = false }, confirmButton = { TextButton(onClick = { about = false }) { Text("Sulje") } },
         title = { Text("Uutishetki ${BuildConfig.VERSION_NAME}") },
         text = { Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text("Rauhallinen uutislukija yksityiseen käyttöön. Ei omia mainoksia, analytiikkaa tai käyttäjätilejä.")
             Text("Nimen Roboto-kirjasin: Google, Apache License 2.0. Lisenssi sisältyy sovelluksen tiedostoihin.", style = MaterialTheme.typography.bodySmall)
-            Text("Lähteet: Iltalehti, Ilta-Sanomat, Yle Uusimaa, Yle Häme (Kanta-Häme) ja Helsingin Sanomat. Kaikissa syötteissä ei ole kuvia tai kattavaa aiheluokitusta.")
+            Text("Lähteet: Iltalehti, Ilta-Sanomat, Yle Uusimaa, Yle Häme (Kanta-Häme) Helsingin Sanomat, Stara ja Pelaaja. Kaikissa syötteissä ei ole kuvia tai kattavaa aiheluokitusta.")
             Text("Uutiset ja kuvat haetaan suoraan julkaisijoilta, jotka näkevät verkkopyynnön ja IP-osoitteen. Artikkelisivuilla voi olla mainoksia, seurantaa ja maksumuureja.")
             Text("Tallennetut otsikot ja kuvaukset toimivat ilman verkkoa. Kuvat ovat rajatussa välimuistissa, eikä niiden offline-saatavuutta taata. Sisällön oikeudet kuuluvat julkaisijoille.")
         } })

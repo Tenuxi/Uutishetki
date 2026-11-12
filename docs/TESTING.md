@@ -73,3 +73,12 @@ Kolme kohdennettua Python-testiä: salaisuuksien puuttuminen, väärä alias/bas
 0.5.1:n main-tarkistus: [Actions 42772338669](https://github.com/Tenuxi/Uutishetki/actions/runs/42772338669) onnistui. Lisäksi alkuperäisen keystoren ja paikallisen varakopion varmenteet palautettiin OpenSSL:llä ja SHA-256 verrattiin lukitukseen; tiedosto-oikeudet 0600. Release-käännös ja valmiin release-APK:n varmenne odottavat Secrets-käyttöönottoa. Päivitysasennusta laitteella ei testattu.
 
 11.11.2026: [Release-ajo 42976338371](https://github.com/Tenuxi/Uutishetki/actions/runs/42976338371) onnistui. Pysyvä keystore ja valmis release-APK vastasivat lukittua varmennetta; apksigner varmisti allekirjoituksen ja aapt-tarkistus applicationId:n, versionCoden 8, version 0.5.1 sekä ei-debug-tilan. Väliaikainen runner-avain poistettu. Releasesista ladatun APK:n tiedostotiiviste, v2-varmenne ja manifestimetatiedot tarkistettu erikseen. Ei paikallista Android-buildia tai laitetestiä.
+
+
+## 0.6.0 — uudet lehdet ja sääpaneeli
+
+Kohdennetut testit: Staran kategoriat ja luokittelemattomat uutiset, Pelaajan syötekohtainen Digi-luokka, RSS-otsikko/kuvaus/aika ja kuvattomuus, saman artikkelin yhdistäminen, Kaikki-valinta ja rajatun lähteen säilyminen, sijainnin alkuperän päätteleminen todellisesta valinnasta ja välimuistipalautus, sääasteiden pyöristys/puuttuminen sekä päivitysrivin Helsinki-päiväraja kesällä ja talvella. Aiemmat ennusteen päivämäärä- ja sadetodennäköisyystestit säilyvät.
+
+Koodista tarkistettu: paneelin rasti ja Dialogin paluutoiminto sulkevat paneelin; ratas avaa nykyisen sääasetukset sisältävän sivupaneelin. Paneeli käyttää safeDrawing-rajoja, rajattua korkeutta, vierivää sisältöä ja erillistä otsikkoriviä. Ennustekortit pinoutuvat alle 360 dp sisältöleveydellä tai fontScale-arvon ylittäessä 1,3. Säätiedon alkuperä tallentuu yhdessä saman haun tietojen kanssa, ei päätellä jälkikäteen asetuksista. Vanha välimuisti ilman alkuperää haetaan uudelleen, asetuksia muuttamatta. Nykyiset suodattimet ja tallennusformaatti säilyvät.
+
+Paikallisesti vain XML-jäsennys, diff- ja julkaisumetatietojen tarkistus. Testit, Lint ja APK-käännös Actionsissa. Ei emulaattoria tai paikallista Android-buildia. Laitteella testaamatta: dialogin todellinen asettelu pienellä näytöllä/vaaka-asennossa/suurimmalla fontilla, TalkBack, ratas/paluu/rasti, päivitysasennus 0.5.1:n päälle sekä asetusten säilyminen oikealla laitteella.

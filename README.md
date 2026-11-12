@@ -33,7 +33,7 @@ Julkaise jatkossa päivittämällä versio/muutosloki, commit ja push main-haara
 
 ## Uutislähteet ja rajoitteet
 
-Katso [lähdeselvitys](docs/SOURCES.md), jossa ovat 5.11.2026 tarkistetut URL:t, metatiedot, ehdot ja kategoriakartoitus. Kaikki viisi lähdettä vastasivat HTTP 200 ja kelvollisella RSS:llä. Yle Häme käyttää **Kanta-Hämeen** syötettä. Ylen tarkistetuissa alueuutisissa ei ollut kuvia. Iltalehden kokoomasyöte on vain 20 uutisen ikkuna, joten aiheita voi puuttua. Sovellus ei täydennä kuvia tai tekstejä artikkelisivuja kaapimalla.
+Katso [lähdeselvitys](docs/SOURCES.md), jossa ovat tarkistetut URL:t, metatiedot, ehdot ja kategoriakartoitus (alkuperäiset lähteet 5.11.2026, Stara ja Pelaaja 12.11.2026). Seitsemän lehden käytetyt syötteet ovat vastanneet HTTP 200 ja kelvollisella RSS:llä. Yle Häme käyttää **Kanta-Hämeen** syötettä. Ylen tarkistetuissa alueuutisissa ei ollut kuvia. Iltalehden kokoomasyöte on vain 20 uutisen ikkuna, joten aiheita voi puuttua. Sovellus ei täydennä kuvia tai tekstejä artikkelisivuja kaapimalla.
 
 Tämä on laitteessa toimiva yksityinen RSS-lukija, ei sisällön uudelleenjulkaisupalvelu. Julkisen tai kaupallisen jakelun oikeuksia ei ole hankittu. Sanoman RSS-erityisehtojen sivujen lukeminen estyi HTTP 403:een; niiden ajantasaisia erityisehtoja ei ole varmistettu. Syötteen saatavuus ei itsessään ole uudelleenjulkaisulupa.
 

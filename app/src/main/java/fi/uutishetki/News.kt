@@ -14,7 +14,9 @@ enum class Source(val label: String, val feed: String) {
     IS("Ilta-Sanomat", "https://www.is.fi/rss/tuoreimmat.xml"),
     UUSIMAA("Yle Uusimaa", "https://yle.fi/rss/t/18-147345/fi"),
     HAME("Yle Häme", "https://yle.fi/rss/t/18-138727/fi"),
-    HS("Helsingin Sanomat", "https://www.hs.fi/rss/tuoreimmat.xml")
+    HS("Helsingin Sanomat", "https://www.hs.fi/rss/tuoreimmat.xml"),
+    STARA("Stara", "https://feeds.feedburner.com/stara"),
+    PELAAJA("Pelaaja", "https://www.pelaaja.fi/feed/")
 }
 enum class Topic(val label: String, val aliases: Set<String>) {
     DOMESTIC("Kotimaa", setOf("kotimaa", "politiikka", "kaupunki")),
@@ -31,7 +33,7 @@ data class News(
 data class Feed(val source: Source, val url: String, val topic: Topic? = null) {
     val label get() = source.label + if (topic == null) "" else " · ${topic.label}"
 }
-val feeds = Source.entries.map { Feed(it, it.feed) } + listOf(
+val feeds = Source.entries.map { Feed(it, it.feed, if (it == Source.PELAAJA) Topic.DIGITAL else null) } + listOf(
     Feed(Source.IL, "https://www.iltalehti.fi/rss/bitti.xml", Topic.DIGITAL),
     Feed(Source.IS, "https://www.is.fi/rss/digitoday.xml", Topic.DIGITAL)
 )
@@ -86,7 +88,12 @@ object FeedParser {
             val id = source.name + ":" + MessageDigest.getInstance("SHA-256")
                 .digest(key.toByteArray()).joinToString("") { "%02x".format(it) }
             val categories = item.children().filter { it.tagName() == "category" }.map { plain(it.text()).lowercase(Locale.ROOT) }
-            val topics = Topic.entries.filter { topic -> categories.any { it in topic.aliases } }.toSet() + listOfNotNull(feedTopic)
+            val topics = Topic.entries.filter { topic -> categories.any { it in topic.aliases } }.toSet() + listOfNotNull(feedTopic) +
+                if (source == Source.STARA) categories.mapNotNull { when (it) {
+                    "digi" -> Topic.DIGITAL
+                    "elokuvat", "dvd", "staratv viihde" -> Topic.ENTERTAINMENT
+                    else -> null
+                } }.toSet() else emptySet()
             val image = item.children().firstNotNullOfOrNull { el ->
                 if ((el.tagName() == "enclosure" && el.attr("type").startsWith("image/")) ||
                     (el.tagName() in setOf("media:content", "media:thumbnail") &&

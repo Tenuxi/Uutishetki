@@ -24,6 +24,11 @@ val HELSINKI = WeatherPlace("Helsinki", 60.17, 24.94)
 
 data class WeatherSettings(val enabled: Boolean = true, val automatic: Boolean = true, val manual: WeatherPlace? = null, val visibilityExplicit: Boolean = false) {
     fun weatherPlace(located: WeatherPlace?): WeatherPlace = if (automatic) located ?: HELSINKI else manual ?: HELSINKI
+    fun origin(located: WeatherPlace?) = when {
+        automatic && located != null -> WeatherOrigin.CURRENT
+        !automatic && manual != null -> WeatherOrigin.MANUAL
+        else -> WeatherOrigin.DEFAULT
+    }
     fun trafficPlace(located: WeatherPlace?): WeatherPlace? = if (automatic) located else manual
     fun encode(): String = JSONObject().put("enabled", enabled).put("automatic", automatic)
         .put("visibilityExplicit", visibilityExplicit).put("manual", manual?.json() ?: JSONObject.NULL).toString()
@@ -36,13 +41,26 @@ data class WeatherSettings(val enabled: Boolean = true, val automatic: Boolean =
         }.getOrDefault(WeatherSettings())
     }
 }
+enum class WeatherOrigin(val label: String) {
+    CURRENT("Nykyinen sijainti"), MANUAL("Valittu paikkakunta"), DEFAULT("Oletuspaikkakunta")
+}
+
+fun weatherDegrees(value: Double?): String = value?.roundToInt()?.let { if (it > 0) "+$it°" else "$it°" } ?: "—"
+fun weatherUpdatedLabel(observedAt: Long, now: Long): String {
+    val time = java.time.Instant.ofEpochMilli(observedAt).atZone(HELSINKI_ZONE)
+    val today = java.time.Instant.ofEpochMilli(now).atZone(HELSINKI_ZONE).toLocalDate()
+    val pattern = if (time.toLocalDate() == today) "H.mm" else "d.M.yyyy H.mm"
+    return "Päivitetty " + time.format(java.time.format.DateTimeFormatter.ofPattern(pattern))
+}
+
 data class WeatherData(val place: WeatherPlace, val temperature: Double, val code: Int,
-    val isDay: Boolean, val observedAt: Long, val fetchedAt: Long, val forecast: List<DailyForecast> = emptyList()) {
+    val isDay: Boolean, val observedAt: Long, val fetchedAt: Long, val forecast: List<DailyForecast> = emptyList(), val origin: WeatherOrigin? = null) {
     // Both clocks are checked: neither an old API observation nor an old cache looks current.
     fun isFresh(now: Long) = now - observedAt in 0..60 * MINUTE && now - fetchedAt in 0..30 * MINUTE
-    val temperatureLabel: String get() = temperature.roundToInt().let { if (it > 0) "+$it°" else "$it°" }
+    val temperatureLabel: String get() = weatherDegrees(temperature)
     fun encode() = JSONObject().put("place", place.json()).put("temperature", temperature).put("code", code)
         .put("day", isDay).put("observed", observedAt).put("fetched", fetchedAt)
+        .put("origin", origin?.name ?: JSONObject.NULL)
         .put("forecast", org.json.JSONArray(forecast.map { it.json() })).toString()
     companion object {
         fun decode(raw: String?): WeatherData? = runCatching {
@@ -50,12 +68,12 @@ data class WeatherData(val place: WeatherPlace, val temperature: Double, val cod
             val temp = j.getDouble("temperature")
             require(temp.isFinite() && temp in -100.0..70.0)
             WeatherData(WeatherPlace.fromJson(j.getJSONObject("place")), temp, j.getInt("code"), j.getBoolean("day"),
-                j.getLong("observed"), j.getLong("fetched"), decodeForecast(j.optJSONArray("forecast")))
+                j.getLong("observed"), j.getLong("fetched"), decodeForecast(j.optJSONArray("forecast")), WeatherOrigin.entries.find { it.name == j.optString("origin") })
         }.getOrNull()
     }
 }
 data class WeatherUiState(val data: WeatherData? = null, val loading: Boolean = false,
-    val error: String? = null, val requestedPlace: WeatherPlace = HELSINKI, val now: Long = System.currentTimeMillis()) {
+    val error: String? = null, val requestedPlace: WeatherPlace = HELSINKI, val now: Long = System.currentTimeMillis(), val origin: WeatherOrigin = WeatherOrigin.DEFAULT) {
     val current: WeatherData? get() = data?.takeIf { error == null && it.isFresh(now) }
 }
 object WeatherParser {
