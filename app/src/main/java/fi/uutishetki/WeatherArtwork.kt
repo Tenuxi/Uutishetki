@@ -35,17 +35,17 @@ fun WeatherArtwork(code: Int?, day: Boolean, modifier: Modifier) {
     Image(painterResource(weatherArtwork(code, day)), null, modifier)
 }
 @Composable
-fun WeatherHero(data: WeatherData) {
+fun WeatherHero(data: WeatherData, animate: Boolean = true) {
     BoxWithConstraints(Modifier.fillMaxWidth()) {
         val largeFont = androidx.compose.ui.platform.LocalDensity.current.fontScale > 1.5f
         if (largeFont || maxWidth < 260.dp) {
             Column(Modifier.padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                WeatherArtwork(data.code, data.isDay, Modifier.size(104.dp))
+                AnimatedWeatherIcon(data.code, data.isDay, Modifier.size(104.dp), animate)
                 WeatherTemperature(data)
             }
         } else Row(Modifier.fillMaxWidth().padding(vertical = 12.dp, horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            WeatherArtwork(data.code, data.isDay, Modifier.widthIn(max = 136.dp).weight(1f).aspectRatio(1f))
+            AnimatedWeatherIcon(data.code, data.isDay, Modifier.widthIn(max = 136.dp).weight(1f).aspectRatio(1f), animate)
             Column(Modifier.weight(1.2f)) { WeatherTemperature(data) }
         }
     }

@@ -123,3 +123,12 @@ Visuaalisesti tarkistettu generoidut vaalea/tumma maisema sekä Chrome-resurssik
 Android SDK / Compose-renderöinti ei ole käytettävissä. Ei paikallista Android-buildia tai emulaattoria. Todellinen fonttiskaalaus, pienet näytöt, järjestelmäinsetit, rivitys, dialogin vieritys ja päivitysasennus ovat laitteella testaamatta. Nykyiset toiminnalliset testit/Lint/build ajetaan Actionsissa; ei uusia pelkkiä ulkoasutestejä.
 
 0.7.2:n [Actions-tarkistus 43610891541](https://github.com/Tenuxi/Uutishetki/actions/runs/43610891541) onnistui: 51 yksikkötestiä, 0 virhettä, 0 ohitettua, julkaisusuojauksen Python-testit sekä Android Lint ja koekäännös läpäistiin. [Release-ajo 43611115362](https://github.com/Tenuxi/Uutishetki/actions/runs/43611115362) onnistui. Julkaistusta APK:sta tarkistettiin SHA-256, pysyvä v2-varmenne, applicationId `fi.uutishetki`, versio 0.7.2, versionCode 12 ja ei-debug-tila. [APK](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.7.2/Uutishetki-0.7.2.apk). Ei laitetestiä.
+
+
+## 0.8.0 — sääanimaatiot
+
+Kolme kohdennettua logiikkatestiä: WMO-sade/tihku/lumi/ukkonen-kartoitus, selkeän/pilvisen/sumuisen ero sekä puuttuva/tuntematon/vanhentunut sää ilman nykyisen sään animaatiota. Ei uusia väri- tai sommittelutestejä.
+
+Koodista tarkistettu: sama nykyisen tiedon tuoreustarkistus ohjaa yläpalkkia ja paneelin taustaa, vanha pääkuva jää liikkumattomaksi. Ennustekuvat ja kaikki tekstit pysyvät staattisina. Animaatiot piirretään Canvas/graphicsLayer-vaiheessa; kellon lukeminen ei muuta layoutia joka ruudulla. Enintään 28 sääpartikkelia taustalla ja 3 kuvakkeessa, noin 30 fps enimmäistahti. LaunchedEffect + repeatOnLifecycle(RESUMED) keskeyttää kellon taustalla; paneelin poistuminen compositionista peruuttaa sen efektit. ContentObserver seuraa Androidin ANIMATOR_DURATION_SCALE-asetusta ja ValueAnimator.areAnimatorsEnabled estää kellosilmukan, kun animaatiot on poistettu käytöstä. Havaitsija poistetaan compositionin mukana. Ukkosessa ei vilkkuvia valoefektejä.
+
+Ei paikallista Android-buildia tai emulaattoria. Androidin animaation sujuvuutta, laitteen virrankulutusta, todellista taustalle siirtymistä ja järjestelmäasetuksen vaihtoa sekä päivitysasennusta ei testattu laitteella. Nykyinen ympäristö ei sisällä natiivin Compose-renderöinnin työkalua. Testit, Lint ja APK-käännös Actionsissa.

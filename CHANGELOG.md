@@ -1,5 +1,13 @@
 # Muutosloki
 
+## 0.8.0 — 14.11.2026
+
+- Säätilan mukaan animoitu yläpalkin sääkuvake sekä sääpaneelin maisema ja pääsääkuvitus. Vesisateella sadepisaroita, tihkulla pienempiä pisaroita, lumella lumihiutaleita, pilvillä ja sumulla hidasta liikettä. Selkeän päivän ja yön kuvitus säilyy erillisenä.
+- Kevyet Compose-animaatiot ilman GIF-tiedostoja, uusia riippuvuuksia tai verkkolatauksia. Ennustearvot ja tekstit pysyvät paikallaan; ukkonen ei aiheuta vilkkumista.
+- Animaatiokello toimii vain näkyvän sovelluksen RESUMED-tilassa. Paneelin sulkeminen poistaa sen animaatiot. Androidin poistettu animaatioasetus pysäyttää liikkeen. Puuttuva tai vanhentunut sää ei saa nykyistä säätä esittävää animaatiota.
+- Nykyiset uutiset, asetukset, säähaku ja sijainti säilyvät. Sama applicationId ja pysyvä release-varmenne; versionCode 13.
+
+
 ## 0.7.2 — 14.11.2026
 
 - Korvattu omat kirjainmerkit Iltalehden, Ilta-Sanomien, Helsingin Sanomien, Staran ja Pelaajan virallisilta sivuilta varmennetuilla kuvakkeilla. Alkuperäiset värit ja mittasuhteet säilyvät, resurssit mukana sovelluksessa. Ylen kaksi aluetta näkyvät käyttäjän päätöksellä ilman logoa, koska Ylen edellyttämää käyttölupaa ei ole.

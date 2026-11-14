@@ -28,7 +28,7 @@ fun WeatherButton(state: WeatherUiState, onClick: () -> Unit) {
     TextButton(onClick = onClick, modifier = Modifier.widthIn(max = 156.dp).heightIn(min = 48.dp)
         .semantics { contentDescription = if (current != null) "${current.place.name}, sää: ${current.temperatureLabel}, ${weatherDescription(current.code)}. Open-Meteo. Avaa säätiedot."
             else "${state.requestedPlace.name}: ${if (state.loading) "Säätä haetaan" else "Sää ei saatavilla"}. Avaa säätiedot." }, contentPadding = PaddingValues(horizontal = 6.dp)) {
-        WeatherIcon(current?.let { weatherSymbol(it.code, it.isDay) } ?: WeatherSymbol.UNKNOWN)
+        AnimatedWeatherIcon(current?.code, current?.isDay ?: true, Modifier.size(28.dp))
         Spacer(Modifier.width(4.dp))
         Column(Modifier.weight(1f, fill = false)) {
             Text(current?.temperatureLabel ?: if (state.loading) "…" else "—", fontSize = 14.sp, maxLines = 1)
@@ -36,20 +36,6 @@ fun WeatherButton(state: WeatherUiState, onClick: () -> Unit) {
                 maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
-}
-@Composable
-private fun WeatherIcon(symbol: WeatherSymbol, modifier: Modifier = Modifier.size(18.dp)) {
-    val resource = when (symbol) {
-        WeatherSymbol.SUN -> R.drawable.weather_sun
-        WeatherSymbol.MOON -> R.drawable.weather_moon
-        WeatherSymbol.CLOUD -> R.drawable.weather_cloud
-        WeatherSymbol.RAIN -> R.drawable.weather_rain
-        WeatherSymbol.SNOW -> R.drawable.weather_snow
-        WeatherSymbol.THUNDER -> R.drawable.weather_thunder
-        WeatherSymbol.FOG -> R.drawable.weather_fog
-        WeatherSymbol.UNKNOWN -> R.drawable.weather_unknown
-    }
-    Icon(painterResource(resource), contentDescription = null, modifier = modifier)
 }
 @Composable
 fun WeatherDetails(state: WeatherUiState, onSettings: () -> Unit, onDismiss: () -> Unit) {
@@ -76,6 +62,7 @@ fun WeatherDetails(state: WeatherUiState, onSettings: () -> Unit, onDismiss: () 
                             contentDescription = null, modifier = Modifier.matchParentSize(),
                             contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                             alignment = Alignment.TopCenter)
+                        WeatherAtmosphere(state.current?.code, state.current?.isDay ?: true, Modifier.matchParentSize())
                         Box(Modifier.matchParentSize().background(Brush.verticalGradient(
                             0f to palette.weather.copy(alpha = .12f),
                             .65f to palette.weather.copy(alpha = .05f),
@@ -100,7 +87,7 @@ fun WeatherDetails(state: WeatherUiState, onSettings: () -> Unit, onDismiss: () 
                                 if (!data.isFresh(state.now) || state.error != null) {
                                     Text("Aiempi säätieto ja ennuste – ajantasaisuutta ei voitu varmistaa.", color = MaterialTheme.colorScheme.error)
                                 }
-                                WeatherHero(data)
+                                WeatherHero(data, animate = state.current != null)
                             } else if (!state.loading) Text("Säätieto ei saatavilla.")
                             BoxWithConstraints(Modifier.fillMaxWidth()) {
                                 val dates = forecastDates(state.now)
