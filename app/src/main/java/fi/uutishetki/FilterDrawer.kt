@@ -1,6 +1,13 @@
 package fi.uutishetki
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.selected
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
@@ -37,6 +44,8 @@ fun RightFilterDrawer(
 ) {
     val contentDirection = LocalLayoutDirection.current
     val scope = rememberCoroutineScope()
+    val scrollState = rememberLazyListState()
+    var helpOpen by rememberSaveable { mutableStateOf(false) }
     BoxWithConstraints(Modifier.fillMaxSize()) {
         // Material's modal drawer supplies scrim dismissal, back handling.
         // RTL positions only the drawer mechanics on the right; contents retain their direction.
@@ -67,26 +76,15 @@ fun RightFilterDrawer(
                                 }
                             }
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                            LazyColumn(Modifier.weight(1f).fillMaxWidth(),
-                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            LazyColumn(Modifier.weight(1f).fillMaxWidth().clipToBounds(), state = scrollState,
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                 item {
                                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                         GroupTitle("Lehdet")
                                         SelectionChip("Kaikki lehdet", selection.source == null, { onSource(null) }, Modifier.fillMaxWidth())
-                                        BoxWithConstraints {
-                                            val columns = if (maxWidth >= 280.dp && androidx.compose.ui.platform.LocalDensity.current.fontScale <= 1.2f) 2 else 1
-                                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                                Source.entries.chunked(columns).forEach { row ->
-                                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                                        row.forEach { source ->
-                                                            SelectionChip(source.label, selection.source == source, { onSource(source) }, Modifier.weight(1f), source)
-                                                        }
-                                                        if (row.size < columns) Spacer(Modifier.weight(1f))
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        SourceChoices(selection.source, onSource)
+
                                     }
                                 }
                                 item {
@@ -97,14 +95,13 @@ fun RightFilterDrawer(
                                                 SelectionChip(topic.label, topic in selection.topics, { onTopic(topic) })
                                             }
                                         }
-                                        TextButton(onClick = onAllTopics, modifier = Modifier.heightIn(min = 48.dp)) { Text("Valitse kaikki") }
-                                        Text("Luokittelemattomat näkyvät oletuksilla ja kaikkien aiheiden valinnalla.",
+                                        FlowRow(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                            TextButton(onClick = onAllTopics) { Text("Valitse kaikki") }
+                                            TextButton(onClick = onDefaults) { Text("Palauta oletukset") }
+                                        }
+                                        TextButton(onClick = { helpOpen = !helpOpen }) { Text("Tietoa aihevalinnoista") }
+                                        if (helpOpen) Text("Luokittelemattomat näkyvät oletuksilla ja kaikkien aiheiden valinnalla.",
                                             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    }
-                                }
-                                item {
-                                    OutlinedButton(onClick = onDefaults, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
-                                        Text("Palauta oletukset")
                                     }
                                 }
                                 item { AppearanceSettings() }
@@ -140,33 +137,52 @@ private fun GroupTitle(label: String) {
 }
 
 @Composable
-private fun SelectionChip(label: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier, source: Source? = null) {
-    FilterChip(
-        selected = selected,
-        onClick = onClick,
-        modifier = modifier.heightIn(min = 48.dp),
-        shape = RoundedCornerShape(16.dp),
-        label = {
-            if (source == null) Text(label)
-            else Column(Modifier.padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    SourceBadge(source)
-                    Spacer(Modifier.weight(1f))
-                    if (selected) Icon(painterResource(R.drawable.ic_check), null, Modifier.size(16.dp))
-                }
-                Text(label)
-            }
-        },
-        leadingIcon = if (source == null && selected) { {
-            Icon(painterResource(R.drawable.ic_check), contentDescription = null, modifier = Modifier.size(16.dp))
-        } } else null,
-        colors = FilterChipDefaults.filterChipColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+private fun SelectionChip(label: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    FilterChip(selected = selected, onClick = onClick, modifier = modifier.heightIn(min = 48.dp),
+        shape = RoundedCornerShape(12.dp), label = { Text(label) },
+        leadingIcon = if (selected) { { Icon(painterResource(R.drawable.ic_check), null, Modifier.size(16.dp)) } } else null,
+        colors = FilterChipDefaults.filterChipColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-            selectedLeadingIconColor = MaterialTheme.colorScheme.primary
-        ),
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer),
         border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selected,
-            borderColor = MaterialTheme.colorScheme.outlineVariant, selectedBorderColor = MaterialTheme.colorScheme.primary)
-    )
+            borderColor = MaterialTheme.colorScheme.outlineVariant, selectedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = .6f)))
+}
+
+@Composable
+private fun SourceChoices(selected: Source?, onSource: (Source) -> Unit) {
+    val measurer = rememberTextMeasurer()
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    val style = MaterialTheme.typography.labelLarge
+    // Measure full short names and the longest word of HS at the actual user's font scale.
+    val textWidth = Source.entries.maxOf { source ->
+        val parts = if (source == Source.HS) source.label.split(' ') else listOf(source.label)
+        parts.maxOf { measurer.measure(it, style = style, softWrap = false).size.width }
+    }
+    BoxWithConstraints {
+        val required = with(density) { textWidth.toDp() } + 30.dp + 8.dp + 16.dp
+        val columns = if (maxWidth >= required * 2 + 8.dp && density.fontScale <= 1.3f) 2 else 1
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Source.entries.chunked(columns).forEach { sources ->
+                Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    sources.forEach { source ->
+                        val active = selected == source
+                        Surface(onClick = { onSource(source) },
+                            modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 56.dp).semantics { this.selected = active },
+                            shape = RoundedCornerShape(12.dp),
+                            color = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerLow,
+                            contentColor = if (active) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface,
+                            border = androidx.compose.foundation.BorderStroke(.7.dp,
+                                if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant)) {
+                            Row(Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                SourceBadge(source, 30.dp)
+                                Text(source.label, Modifier.weight(1f), style = style)
+                            }
+                        }
+                    }
+                    if (sources.size < columns) Spacer(Modifier.weight(1f))
+                }
+            }
+        }
+    }
 }

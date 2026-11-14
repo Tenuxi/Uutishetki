@@ -1,0 +1,7 @@
+# Uutishetken sääkuvitus
+
+Projektia varten tehty alkuperäinen vektorisarja, ei julkaisijoiden tai sääpalvelun logoja. Ei ulkoista grafiikkapakettia eikä ajonaikaista verkkohakua. Sarjan lähde on `scripts/generate_weather_art.py`, joka kirjoittaa Android VectorDrawable -resurssit sekä vastaavat SVG:t tähän hakemistoon. Täytetyt muodot, lineaariset liukuvärit, erilliset takapilvet ja kevyt varjomuoto antavat kerroksellisuutta. Ei ääriviivakuvakkeita pääsäässä tai ennusteissa.
+
+12 variaatiota. Pääsään ja ennusteiden kytkentä on `WeatherArtwork.kt`: WMO 0/1 selkeä, 2 puolipilvinen, 3 pilvinen, 45/48 sumu, 51–57 tihku, 61–67 ja 80–82 sade, 71–77 ja 85/86 lumi, 95–99 ukkonen, muut tuntematon. Listatut välit tarkoittavat vain koodin eksplisiittisesti käsittelemiä arvoja. Päivä/yö vaikuttaa selkeään ja puolipilviseen säähän. Ennusteen päiväkuva on päivän yhteenveto. Räntäresurssi toimitetaan sarjassa, mutta sitä ei käytetä, koska API ei anna erillistä räntäkoodia. Säätekstit ja sateen todennäköisyyden merkitys säilyvät.
+
+`preview.png` on SVG-resurssien koottu Chrome-renderöinti vaalealla ja tummalla pinnalla, ei sovelluksen kuvakaappaus. Android käyttää XML-vektoreita ilman rasterikuvien latausta. Tämän sarjan SVG-kuvissa ovat samat polut ja absoluuttiset gradienttikoordinaatit kuin Android-resursseissa. Tarkistuksessa kuvat näkyivät erillisinä, täytettyinä, ehjinä ja oikealla läpinäkyvällä taustalla. Natiivin Android-renderöinnin eroavaisuuksia ei testattu.

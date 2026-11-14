@@ -1,5 +1,15 @@
 # Muutosloki
 
+## 0.7.1 — 14.11.2026
+
+- Lehtivalinnat vaakariveiksi: lähdemerkki vasemmalla, nimi oikealla. Nimien mitattu tekstileveys ratkaisee yhden tai kahden sarakkeen asettelun. Saman rivin painikkeet ovat yhtä korkeita.
+- Sivupaneelin vieritys rajattu otsikon alapuolelle, pienemmät välit ja kompaktit valinta-/palautustoiminnot. Ulkoasu avaa nykyisestä valinnasta kolme vaihtoehtoa; aiheiden selitys on avattava.
+- Yhteiset liukuväriset lähdemerkit, pienempi lähderivi sekä kevyempi uutiskorttien pintavaihtelu ja reunus.
+- Uusi 12 kuvan alkuperäinen, täytetty ja varjostettu vektorisääsarja: aurinko, kuu, päivä-/yöpuolipilvinen, pilvinen, sade, tihku, lumi, räntä, ukkonen, sumu ja tuntematon. Räntäkuvaa ei kytketä keksittyyn sääarvoon, koska käytetty WMO-koodisto ei erota räntää.
+- Pääsään maisemakerrokset ja liukuväri, ennustekorttien kuvitus, reunus ja pintavaihtelu. Ennusteet normaalilla puhelinleveydellä rinnakkain, pienessä tilassa tai suurella tekstillä allekkain.
+- Nykyinen applicationId, pysyvä release-avain ja kaikki käyttäjän asetukset säilyvät. VersionCode 11.
+
+
 ## 0.7.0 — 14.11.2026
 
 - Yhtenäinen vaalea ja tumma ilme koko sovellukseen. Ulkoasu-valinnat Järjestelmän mukaan (oletus), Vaalea ja Tumma vaihtuvat heti ja tallentuvat päivitysten yli.

@@ -1,6 +1,9 @@
 package fi.uutishetki
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -74,7 +77,7 @@ fun WeatherDetails(state: WeatherUiState, onSettings: () -> Unit, onDismiss: () 
                         }
                     }
                     Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         if (state.loading) {
                             LinearProgressIndicator(Modifier.fillMaxWidth())
                             Text("Päivitetään säätä…", style = MaterialTheme.typography.bodySmall)
@@ -84,21 +87,14 @@ fun WeatherDetails(state: WeatherUiState, onSettings: () -> Unit, onDismiss: () 
                             if (!data.isFresh(state.now) || state.error != null) {
                                 Text("Aiempi säätieto ja ennuste – ajantasaisuutta ei voitu varmistaa.", color = MaterialTheme.colorScheme.error)
                             }
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                                WeatherIcon(weatherSymbol(data.code, data.isDay), Modifier.size(72.dp))
-                                Column {
-                                    Text(data.temperatureLabel, style = MaterialTheme.typography.displayMedium,
-                                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
-                                    Text(weatherDescription(data.code), style = MaterialTheme.typography.bodyLarge)
-                                }
-                            }
+                            WeatherHero(data)
                         } else if (!state.loading) Text("Säätieto ei saatavilla.")
                         BoxWithConstraints(Modifier.fillMaxWidth()) {
                             val dates = forecastDates(state.now)
-                            if (maxWidth >= 320.dp && fontScale <= 1.3f) {
-                                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            if (maxWidth >= 280.dp && fontScale <= 1.3f) {
+                                Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                                     dates.forEachIndexed { index, date ->
-                                        ForecastCard(index, date, data?.forecast?.find { it.date == date }, state.loading, Modifier.weight(1f))
+                                        ForecastCard(index, date, data?.forecast?.find { it.date == date }, state.loading, Modifier.weight(1f).fillMaxHeight())
                                     }
                                 }
                             } else {
@@ -131,13 +127,13 @@ fun WeatherDetails(state: WeatherUiState, onSettings: () -> Unit, onDismiss: () 
 
 @Composable
 private fun ForecastCard(index: Int, date: java.time.LocalDate, forecast: DailyForecast?, loading: Boolean, modifier: Modifier) {
-    Surface(modifier, shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp), color = LocalAppSurfaces.current.weatherCard, contentColor = MaterialTheme.colorScheme.onSurface) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Surface(modifier, border = BorderStroke(.7.dp, MaterialTheme.colorScheme.outlineVariant), shadowElevation = 1.dp, shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp), color = LocalAppSurfaces.current.weatherCard, contentColor = MaterialTheme.colorScheme.onSurface) {
+        Column(Modifier.background(Brush.verticalGradient(listOf(LocalAppSurfaces.current.weatherCard, LocalAppSurfaces.current.weather))).padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(if (index == 0) "Huomenna" else "Ylihuomenna", style = MaterialTheme.typography.titleSmall)
             Text(date.format(java.time.format.DateTimeFormatter.ofPattern("d.M.")), style = MaterialTheme.typography.bodySmall)
             if (forecast == null) Text(if (loading) "Haetaan ennustetta…" else "Ennuste ei saatavilla.")
             else {
-                WeatherIcon(forecast.code?.let { weatherSymbol(it, true) } ?: WeatherSymbol.UNKNOWN, Modifier.size(32.dp))
+                WeatherArtwork(forecast.code, true, Modifier.size(64.dp))
                 Text(forecast.code?.let(::weatherDescription) ?: "Säätila ei saatavilla", style = MaterialTheme.typography.bodyMedium)
                 Text("Ylin ${weatherDegrees(forecast.high)}", style = MaterialTheme.typography.titleLarge,
                     fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)

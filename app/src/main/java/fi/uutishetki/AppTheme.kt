@@ -4,6 +4,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
@@ -93,15 +99,22 @@ fun SettingsHeading(label: String, icon: Int = R.drawable.ic_settings) {
 @Composable
 fun AppearanceSettings() {
     val control = LocalAppearance.current
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    Column {
         HorizontalDivider()
-        SettingsHeading("Ulkoasu")
-        Appearance.entries.forEach { mode ->
-            FilterChip(selected = control.value == mode, onClick = { control.choose(mode) },
-                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
-                label = { Text(mode.label) }, leadingIcon = if (control.value == mode) { {
-                    Icon(painterResource(R.drawable.ic_check), null, Modifier.size(18.dp))
-                } } else null)
+        TextButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
+            Icon(painterResource(R.drawable.ic_settings), null, Modifier.size(20.dp))
+            Spacer(Modifier.width(8.dp))
+            Column(Modifier.weight(1f), horizontalAlignment = Alignment.Start) {
+                Text("Ulkoasu")
+                Text(control.value.label, style = MaterialTheme.typography.labelMedium)
+            }
+            Text(if (expanded) "−" else "+")
+        }
+        if (expanded) Appearance.entries.forEach { mode ->
+            FilterChip(selected = control.value == mode, onClick = { control.choose(mode); expanded = false },
+                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp), label = { Text(mode.label) },
+                leadingIcon = if (control.value == mode) { { Icon(painterResource(R.drawable.ic_check), null, Modifier.size(18.dp)) } } else null)
         }
     }
 }
@@ -110,12 +123,21 @@ val Source.monogram: String get() = when (this) {
     Source.HAME -> "YH"; Source.STARA -> "ST"; Source.PELAAJA -> "P"
 }
 @Composable
-fun SourceBadge(source: Source) {
-    Surface(shape = CircleShape, color = MaterialTheme.colorScheme.secondaryContainer,
-        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        modifier = Modifier.clearAndSetSemantics { }) {
-        Box(Modifier.defaultMinSize(minWidth = 30.dp, minHeight = 30.dp).padding(4.dp), contentAlignment = Alignment.Center) {
-            Text(source.monogram, style = MaterialTheme.typography.labelSmall, maxLines = 1)
+fun SourceBadge(source: Source, size: Dp = 24.dp) {
+    val colors = MaterialTheme.colorScheme
+    Surface(shape = CircleShape, color = Color.Transparent,
+        contentColor = colors.onSecondaryContainer,
+        border = BorderStroke(.6.dp, colors.primary.copy(alpha = .35f)),
+        modifier = Modifier.size(size).clearAndSetSemantics { }) {
+        Box(Modifier.background(Brush.linearGradient(listOf(colors.secondaryContainer, colors.surfaceContainerHigh))),
+            contentAlignment = Alignment.Center) {
+            // Decorative monogram has a fixed geometry; the adjacent full name respects font scale.
+            Text(source.monogram, style = MaterialTheme.typography.labelSmall.copy(
+                fontSize = with(androidx.compose.ui.platform.LocalDensity.current) { (size * .37f).toSp() }),
+                fontWeight = FontWeight.Bold, maxLines = 1)
         }
     }
 }
+@Composable
+fun subtleSurfaceBrush() = Brush.verticalGradient(listOf(MaterialTheme.colorScheme.surface,
+    MaterialTheme.colorScheme.surfaceContainerLow))

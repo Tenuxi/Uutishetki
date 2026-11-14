@@ -195,7 +195,7 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
             LazyColumn(state = listState, modifier = Modifier.fillMaxSize().nestedScroll(readingScroll),
                 contentPadding = PaddingValues(start = 16.dp, end = 16.dp,
                     top = headerHeight + 8.dp, bottom = safePadding.calculateBottomPadding() + 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 if (trafficSettings.enabled && trafficState.unavailable) item(key = "traffic-error") {
                     Text(trafficState.message.orEmpty(), style = MaterialTheme.typography.bodySmall)
                 }
@@ -226,7 +226,7 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
                 }
                 dayGroups.forEach { group ->
                     item(key = "day:${group.date}") {
-                        Column(Modifier.fillMaxWidth().padding(top = 6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Column(Modifier.fillMaxWidth().padding(top = 4.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(dayLabel(group.date, today), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onBackground)
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                         }
@@ -281,14 +281,14 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
 private fun NewsCard(news: News) {
     val context = LocalContext.current
     Card(onClick = { openArticle(context, news.url) }, modifier = Modifier.fillMaxWidth(),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        border = BorderStroke(.7.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = .65f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
         news.image?.let { image ->
             AsyncImage(model = image, contentDescription = null, contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f).background(MaterialTheme.colorScheme.surfaceVariant))
         }
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(Modifier.background(subtleSurfaceBrush()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 SourceBadge(news.source)
                 Text(news.source.label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
