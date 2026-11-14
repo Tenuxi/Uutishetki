@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
@@ -55,6 +57,8 @@ fun WeatherDetails(state: WeatherUiState, onSettings: () -> Unit, onDismiss: () 
     val data = state.data
     val context = LocalContext.current
     val fontScale = androidx.compose.ui.platform.LocalDensity.current.fontScale
+    val palette = LocalAppSurfaces.current
+    val dark = MaterialTheme.colorScheme.background.luminance() < .5f
     androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss,
         properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)) {
         BoxWithConstraints(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing).padding(16.dp),
@@ -62,55 +66,65 @@ fun WeatherDetails(state: WeatherUiState, onSettings: () -> Unit, onDismiss: () 
             val availableHeight = maxHeight
             Surface(Modifier.widthIn(max = 560.dp).fillMaxWidth().heightIn(max = availableHeight),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-                color = LocalAppSurfaces.current.weather, contentColor = MaterialTheme.colorScheme.onSurface, tonalElevation = 0.dp) {
-                Column(Modifier.padding(16.dp)) {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) {
-                            Text((data?.place ?: state.requestedPlace).name, style = MaterialTheme.typography.titleLarge)
-                            Text((data?.origin ?: state.origin).label, style = MaterialTheme.typography.bodySmall)
-                        }
-                        IconButton(onClick = onSettings) {
-                            Icon(painterResource(R.drawable.ic_settings), "Sääasetukset")
-                        }
-                        IconButton(onClick = onDismiss) {
-                            Icon(painterResource(R.drawable.ic_close), "Sulje säätiedot")
-                        }
-                    }
-                    Column(Modifier.weight(1f, fill = false).verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        if (state.loading) {
-                            LinearProgressIndicator(Modifier.fillMaxWidth())
-                            Text("Päivitetään säätä…", style = MaterialTheme.typography.bodySmall)
-                        }
-                        state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                        if (data != null) {
-                            if (!data.isFresh(state.now) || state.error != null) {
-                                Text("Aiempi säätieto ja ennuste – ajantasaisuutta ei voitu varmistaa.", color = MaterialTheme.colorScheme.error)
-                            }
-                            WeatherHero(data)
-                        } else if (!state.loading) Text("Säätieto ei saatavilla.")
-                        BoxWithConstraints(Modifier.fillMaxWidth()) {
-                            val dates = forecastDates(state.now)
-                            if (maxWidth >= 280.dp && fontScale <= 1.3f) {
-                                Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                                    dates.forEachIndexed { index, date ->
-                                        ForecastCard(index, date, data?.forecast?.find { it.date == date }, state.loading, Modifier.weight(1f).fillMaxHeight())
-                                    }
+                color = palette.weather, contentColor = MaterialTheme.colorScheme.onSurface, tonalElevation = 0.dp) {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    // One backdrop spans the actual header, current weather and forecast content.
+                    // ContentScale.Crop preserves aspect ratio as content grows with font size.
+                    Box(Modifier.fillMaxWidth()) {
+                        androidx.compose.foundation.Image(
+                            painterResource(if (dark) R.drawable.weather_landscape_dark else R.drawable.weather_landscape_light),
+                            contentDescription = null, modifier = Modifier.matchParentSize(),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                            alignment = Alignment.TopCenter)
+                        Box(Modifier.matchParentSize().background(Brush.verticalGradient(
+                            0f to palette.weather.copy(alpha = .12f),
+                            .65f to palette.weather.copy(alpha = .05f),
+                            .9f to palette.weather.copy(alpha = .65f),
+                            1f to palette.weather)))
+                        Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                                Column(Modifier.weight(1f)) {
+                                    Text((data?.place ?: state.requestedPlace).name, style = MaterialTheme.typography.titleLarge)
+                                    Text((data?.origin ?: state.origin).label, style = MaterialTheme.typography.bodySmall)
                                 }
-                            } else {
-                                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                IconButton(onClick = onSettings) { Icon(painterResource(R.drawable.ic_settings), "Sääasetukset") }
+                                IconButton(onClick = onDismiss) { Icon(painterResource(R.drawable.ic_close), "Sulje säätiedot") }
+                            }
+                            if (state.loading) {
+                                LinearProgressIndicator(Modifier.fillMaxWidth())
+                                Text("Päivitetään säätä…", style = MaterialTheme.typography.bodySmall)
+                            }
+                            state.error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                            if (data != null) {
+                                if (!data.isFresh(state.now) || state.error != null) {
+                                    Text("Aiempi säätieto ja ennuste – ajantasaisuutta ei voitu varmistaa.", color = MaterialTheme.colorScheme.error)
+                                }
+                                WeatherHero(data)
+                            } else if (!state.loading) Text("Säätieto ei saatavilla.")
+                            BoxWithConstraints(Modifier.fillMaxWidth()) {
+                                val dates = forecastDates(state.now)
+                                if (maxWidth >= 280.dp && fontScale <= 1.3f) {
+                                    Row(Modifier.height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                                        dates.forEachIndexed { index, date ->
+                                            ForecastCard(index, date, data?.forecast?.find { it.date == date }, state.loading, Modifier.weight(1f).fillMaxHeight())
+                                        }
+                                    }
+                                } else Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                                     dates.forEachIndexed { index, date ->
                                         ForecastCard(index, date, data?.forecast?.find { it.date == date }, state.loading, Modifier.fillMaxWidth())
                                     }
                                 }
                             }
                         }
+                    }
+                    Column(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         data?.let { Text(weatherUpdatedLabel(it.observedAt, state.now), style = MaterialTheme.typography.bodySmall) }
                         TextButton(onClick = { informationOpen = !informationOpen }, modifier = Modifier.semantics {
                             contentDescription = "Tietoa säästä, ${if (informationOpen) "sulje lisätiedot" else "avaa lisätiedot"}"
                         }) { Text("Tietoa säästä ${if (informationOpen) "−" else "+"}") }
                         if (informationOpen) {
-                            Text("Sää on mallipohjainen arvio, ei paikallisen mittausaseman havainto. Lämpötilat on pyöristetty kokonaisasteiksi. Sade enint. tarkoittaa päivän suurinta tuntikohtaista sateen todennäköisyyttä.", style = MaterialTheme.typography.bodySmall)
+                            Text("Sää on mallipohjainen arvio, ei paikallisen mittausaseman havainto. Lämpötilat on pyöristetty kokonaisasteiksi. Sade enint. tarkoittaa päivän suurinta tuntikohtaista sateen todennäköisyyttä. Maisema on koristeellinen, ei kuva nykyisestä sijainnista.", style = MaterialTheme.typography.bodySmall)
                             data?.let {
                                 Text("Säätiedon ajankohta ${formatDate(it.observedAt)}\nHaettu ${formatDate(it.fetchedAt)}\nAjat: Europe/Helsinki.", style = MaterialTheme.typography.bodySmall)
                             }
@@ -127,8 +141,8 @@ fun WeatherDetails(state: WeatherUiState, onSettings: () -> Unit, onDismiss: () 
 
 @Composable
 private fun ForecastCard(index: Int, date: java.time.LocalDate, forecast: DailyForecast?, loading: Boolean, modifier: Modifier) {
-    Surface(modifier, border = BorderStroke(.7.dp, MaterialTheme.colorScheme.outlineVariant), shadowElevation = 1.dp, shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp), color = LocalAppSurfaces.current.weatherCard, contentColor = MaterialTheme.colorScheme.onSurface) {
-        Column(Modifier.background(Brush.verticalGradient(listOf(LocalAppSurfaces.current.weatherCard, LocalAppSurfaces.current.weather))).padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+    Surface(modifier, border = BorderStroke(.7.dp, MaterialTheme.colorScheme.outline.copy(alpha = .35f)), shadowElevation = 1.dp, shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp), color = Color.Transparent, contentColor = MaterialTheme.colorScheme.onSurface) {
+        Column(Modifier.background(Brush.verticalGradient(listOf(LocalAppSurfaces.current.weatherCard.copy(alpha = .94f), LocalAppSurfaces.current.weatherCard.copy(alpha = .88f)))).padding(10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(if (index == 0) "Huomenna" else "Ylihuomenna", style = MaterialTheme.typography.titleSmall)
             Text(date.format(java.time.format.DateTimeFormatter.ofPattern("d.M.")), style = MaterialTheme.typography.bodySmall)
             if (forecast == null) Text(if (loading) "Haetaan ennustetta…" else "Ennuste ei saatavilla.")

@@ -1,0 +1,86 @@
+[
+  {
+    "name": "il",
+    "url": "https://assets.ilcdn.fi/apple-touch-icon.png",
+    "final_url": "https://assets.ilcdn.fi/apple-touch-icon.png",
+    "status": 200,
+    "dimensions": [
+      180,
+      180
+    ],
+    "original_sha256": "1b9f209e60ce7bdea3ad42d5ed625d0b1b314c9affeac022542f0c3b77a3979e",
+    "checked": "2026-11-14",
+    "packaged": true,
+    "webp_sha256": "c58852109795a49bf2ebb13ea7adccd56f5523c91991942e0cf84fcfeff82ee0"
+  },
+  {
+    "name": "is",
+    "url": "https://www.is.fi/html-assets/icons/favicon-192x192.png",
+    "final_url": "https://www.is.fi/html-assets/icons/favicon-192x192.png",
+    "status": 200,
+    "dimensions": [
+      192,
+      192
+    ],
+    "original_sha256": "a1739b2d01d4e7d0b0a3947924a0f7db4eafc7eb29ce2515058813a6ef712cef",
+    "checked": "2026-11-14",
+    "packaged": true,
+    "webp_sha256": "b54b2b7c0bdc61964dbf389b9f830b2ced03ffc441a9ecaf5dc36f75a68c9f86"
+  },
+  {
+    "name": "hs",
+    "url": "https://www.hs.fi/html-assets/icons/favicon-192x192.png",
+    "final_url": "https://www.hs.fi/html-assets/icons/favicon-192x192.png",
+    "status": 200,
+    "dimensions": [
+      192,
+      192
+    ],
+    "original_sha256": "168ac73780c4d4d596178b1abe4d510d07238c8ff561942cc8caaf9658498be8",
+    "checked": "2026-11-14",
+    "packaged": true,
+    "webp_sha256": "c4a2772d4eb0494a555b550c59b4e1ef3371323f500d8dfdebfec639a16f6971"
+  },
+  {
+    "name": "yle",
+    "url": "https://yle.fi/ukko/assets/img/yle-logo-180.png",
+    "final_url": "https://yle.fi/ukko/assets/img/yle-logo-180.png",
+    "status": 200,
+    "dimensions": [
+      180,
+      180
+    ],
+    "original_sha256": "b77f3e57bb49844cd699e1d9409b03008c6f1ff0d6fe4936a2a1c9d3f8ad6859",
+    "checked": "2026-11-14",
+    "packaged": false,
+    "omission": "Yle edellyttää lupaa; käyttäjä vahvisti ettei lupaa ole. Näytetään vain lähteen nimi."
+  },
+  {
+    "name": "stara",
+    "url": "https://www.stara.fi/wp-content/uploads/2026/01/cropped-stara_logo_1024x1024-200x200.jpg",
+    "final_url": "https://www.stara.fi/wp-content/uploads/2026/01/cropped-stara_logo_1024x1024-200x200.jpg",
+    "status": 200,
+    "dimensions": [
+      200,
+      200
+    ],
+    "original_sha256": "96bffccfe86eb4bcbdcd6a32cb20be37090a4fa41d47282c7a1f1bb5e86b3ff7",
+    "checked": "2026-11-14",
+    "packaged": true,
+    "webp_sha256": "d95e8411ecf9fe6ccc2cd2ac6d68fd4ea2796ac6e597059068f7e7f0e7018024"
+  },
+  {
+    "name": "pelaaja",
+    "url": "https://www.pelaaja.fi/apple-touch-icon.png",
+    "final_url": "https://www.pelaaja.fi/apple-touch-icon.png",
+    "status": 200,
+    "dimensions": [
+      180,
+      180
+    ],
+    "original_sha256": "6516c23ce5b3b4ae702d7fbccbe9984b25432abbf83d7ba74029c85d23b2e7c0",
+    "checked": "2026-11-14",
+    "packaged": true,
+    "webp_sha256": "d47cefa25bb7b508fb71886919c838f8440abebdcafc3f1a9b538e293170eda2"
+  }
+]

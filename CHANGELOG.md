@@ -1,5 +1,13 @@
 # Muutosloki
 
+## 0.7.2 — 14.11.2026
+
+- Korvattu omat kirjainmerkit Iltalehden, Ilta-Sanomien, Helsingin Sanomien, Staran ja Pelaajan virallisilta sivuilta varmennetuilla kuvakkeilla. Alkuperäiset värit ja mittasuhteet säilyvät, resurssit mukana sovelluksessa. Ylen kaksi aluetta näkyvät käyttäjän päätöksellä ilman logoa, koska Ylen edellyttämää käyttölupaa ei ole.
+- Uudet vaalea ja tumma maisematausta: utuiset tunturikerrokset ja rauhallinen taivas. Yhtenäinen tausta alkaa paikkakunnan takaa, jatkuu pääsään ja ennusteiden taakse ja häipyy ennen lisätietoja.
+- Poistettu erillinen sisempi säälaatikko ja aaltotausta. Ennustekortit ovat hillitysti läpikuultavia ja sääpilvien varjostusta pehmennetty.
+- Ei muutoksia uutisten, suodatuksen, paikannuksen, säähaun tai liikenteen toimintalogiikkaan. Sama applicationId ja pysyvä release-avain, versionCode 12.
+
+
 ## 0.7.1 — 14.11.2026
 
 - Lehtivalinnat vaakariveiksi: lähdemerkki vasemmalla, nimi oikealla. Nimien mitattu tekstileveys ratkaisee yhden tai kahden sarakkeen asettelun. Saman rivin painikkeet ovat yhtä korkeita.

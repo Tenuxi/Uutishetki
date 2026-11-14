@@ -36,23 +36,7 @@ fun WeatherArtwork(code: Int?, day: Boolean, modifier: Modifier) {
 }
 @Composable
 fun WeatherHero(data: WeatherData) {
-    val palette = LocalAppSurfaces.current
-    val accent = MaterialTheme.colorScheme.primary
-    BoxWithConstraints(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp))
-        .background(Brush.verticalGradient(listOf(palette.weatherCard, palette.weather)))) {
-        Canvas(Modifier.matchParentSize()) {
-            val w = size.width; val h = size.height
-            val far = Path().apply {
-                moveTo(0f, h * .83f); cubicTo(w*.2f,h*.37f,w*.4f,h*.95f,w*.7f,h*.62f)
-                cubicTo(w*.85f,h*.5f,w*.95f,h*.65f,w,h*.56f); lineTo(w,h); lineTo(0f,h); close()
-            }
-            drawPath(far, accent.copy(alpha = .06f))
-            val near = Path().apply {
-                moveTo(0f,h*.9f); cubicTo(w*.4f,h*.63f,w*.6f,h*1.1f,w,h*.73f)
-                lineTo(w,h); lineTo(0f,h); close()
-            }
-            drawPath(near, accent.copy(alpha = .07f))
-        }
+    BoxWithConstraints(Modifier.fillMaxWidth()) {
         val largeFont = androidx.compose.ui.platform.LocalDensity.current.fontScale > 1.5f
         if (largeFont || maxWidth < 260.dp) {
             Column(Modifier.padding(12.dp), horizontalAlignment = Alignment.CenterHorizontally) {

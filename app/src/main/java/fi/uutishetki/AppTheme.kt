@@ -118,24 +118,22 @@ fun AppearanceSettings() {
         }
     }
 }
-val Source.monogram: String get() = when (this) {
-    Source.HS -> "HS"; Source.IL -> "IL"; Source.IS -> "IS"; Source.UUSIMAA -> "YU"
-    Source.HAME -> "YH"; Source.STARA -> "ST"; Source.PELAAJA -> "P"
-}
+// Publisher resources are verified website icons, displayed without tint or circular clipping.
+// Yle is intentionally text-only until the user obtains the permission required by Yle.
 @Composable
-fun SourceBadge(source: Source, size: Dp = 24.dp) {
-    val colors = MaterialTheme.colorScheme
-    Surface(shape = CircleShape, color = Color.Transparent,
-        contentColor = colors.onSecondaryContainer,
-        border = BorderStroke(.6.dp, colors.primary.copy(alpha = .35f)),
-        modifier = Modifier.size(size).clearAndSetSemantics { }) {
-        Box(Modifier.background(Brush.linearGradient(listOf(colors.secondaryContainer, colors.surfaceContainerHigh))),
-            contentAlignment = Alignment.Center) {
-            // Decorative monogram has a fixed geometry; the adjacent full name respects font scale.
-            Text(source.monogram, style = MaterialTheme.typography.labelSmall.copy(
-                fontSize = with(androidx.compose.ui.platform.LocalDensity.current) { (size * .37f).toSp() }),
-                fontWeight = FontWeight.Bold, maxLines = 1)
-        }
+fun SourceIcon(source: Source, size: Dp = 26.dp) {
+    val icon = when (source) {
+        Source.IL -> R.drawable.publisher_il
+        Source.IS -> R.drawable.publisher_is
+        Source.HS -> R.drawable.publisher_hs
+        Source.STARA -> R.drawable.publisher_stara
+        Source.PELAAJA -> R.drawable.publisher_pelaaja
+        Source.UUSIMAA, Source.HAME -> null
+    } ?: return
+    Box(Modifier.size(size).background(Color.White, androidx.compose.foundation.shape.RoundedCornerShape(3.dp))
+        .clearAndSetSemantics { }, contentAlignment = Alignment.Center) {
+        androidx.compose.foundation.Image(painterResource(icon), null,
+            Modifier.fillMaxSize().padding(1.dp), contentScale = androidx.compose.ui.layout.ContentScale.Fit)
     }
 }
 @Composable

@@ -175,7 +175,7 @@ private fun SourceChoices(selected: Source?, onSource: (Source) -> Unit) {
                                 if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant)) {
                             Row(Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                SourceBadge(source, 30.dp)
+                                SourceIcon(source, 30.dp)
                                 Text(source.label, Modifier.weight(1f), style = style)
                             }
                         }

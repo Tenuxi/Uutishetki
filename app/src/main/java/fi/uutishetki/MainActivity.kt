@@ -290,7 +290,7 @@ private fun NewsCard(news: News) {
         }
         Column(Modifier.background(subtleSurfaceBrush()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(7.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                SourceBadge(news.source)
+                SourceIcon(news.source)
                 Text(news.source.label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
             }
             Text(news.title, style = MaterialTheme.typography.titleLarge, fontFamily = FontFamily.Serif, fontWeight = FontWeight.SemiBold)

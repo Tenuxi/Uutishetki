@@ -112,3 +112,12 @@ Ympäristöstä ei löytynyt Android SDK:ta, adb/emulaattoria tai projektin Comp
 Nykyiset toiminnalliset testit säilyvät; uusia väri-/sommitteluyksikkötestejä ei lisätty. XML, julkaisumetadata ja diff tarkistetaan paikallisesti, testit/Lint/build Actionsissa. Sama pysyvä julkaisuvarmenne ja applicationId.
 
 0.7.1:n [Actions-tarkistus 43601651874](https://github.com/Tenuxi/Uutishetki/actions/runs/43601651874) onnistui: 51 yksikkötestiä, 0 virhettä ja 0 ohitettua; julkaisusuojauksen Python-testit, Android Lint ja koekäännös läpäistiin. [Julkaisu 43601942900](https://github.com/Tenuxi/Uutishetki/actions/runs/43601942900) onnistui pysyvällä avaimella. Ladatun APK:n SHA-256, v2-varmenne, applicationId `fi.uutishetki`, versio 0.7.1, versionCode 11 ja ei-debug-tila tarkistettu. [APK](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.7.1/Uutishetki-0.7.1.apk). Buildin onnistuminen ei korvaa yllä puuttuviksi kirjattuja koko käyttöliittymän visuaalisia tarkistuksia.
+
+
+## 0.7.2 — julkaisukuvakkeet ja maisemataustat
+
+Virallisten sivujen icon/manifest-viitteet, HTTP 200 -lataukset, kuvien koot ja alkuperätiivisteet dokumentoitu `docs/BRAND_ASSETS.md` ja `design/publishers/sources.json`. Yle jätettiin pois käyttäjän vahvistaman luvan puuttumisen vuoksi. Muiden julkaisijoiden avoimia kuvakelisenssejä ei väitetä.
+
+Visuaalisesti tarkistettu generoidut vaalea/tumma maisema sekä Chrome-resurssikoonti (`design/landscape/resource-preview.png`): kuvakkeiden alkuperäisvärit 26/30 px koossa, neutraali pinta tummassa teemassa, 360 px teemat ja 280 px suuremmat lähdenimet, yhtenäinen maisema ja ennustepintojen luettavuus. Tämä on resurssien HTML-sommittelu, ei natiivin Android-toteutuksen kuvakaappaus. Koodista varmistettu Image ilman tint/colorFilteriä, ContentScale.Fit logoille ja Crop taustalle, yksi sääpaneelin vieritysalue, todelliset tekstit taustan päällä ja maiseman häivytys ennen päivitysriviä.
+
+Android SDK / Compose-renderöinti ei ole käytettävissä. Ei paikallista Android-buildia tai emulaattoria. Todellinen fonttiskaalaus, pienet näytöt, järjestelmäinsetit, rivitys, dialogin vieritys ja päivitysasennus ovat laitteella testaamatta. Nykyiset toiminnalliset testit/Lint/build ajetaan Actionsissa; ei uusia pelkkiä ulkoasutestejä.
