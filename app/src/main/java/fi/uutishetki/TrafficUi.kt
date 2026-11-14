@@ -25,19 +25,18 @@ fun TrafficCard(item: NearbyTraffic, checkedAt: Long, onOpen: () -> Unit = {}) {
     var details by remember { mutableStateOf(false) }
     val notice = item.notice
     Card(onClick = { onOpen(); details = true }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFDAD6), contentColor = Color(0xFF292323)),
-        border = BorderStroke(1.dp, Color(0xFFD7ABA6)), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Icon(painterResource(R.drawable.ic_traffic), contentDescription = null, modifier = Modifier.size(20.dp))
-                Text("Liikennetiedote", style = MaterialTheme.typography.labelLarge)
-            }
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer, contentColor = MaterialTheme.colorScheme.onErrorContainer),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.35f)), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+        Row(Modifier.padding(14.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Icon(painterResource(R.drawable.ic_traffic), contentDescription = null, modifier = Modifier.size(24.dp), tint = MaterialTheme.colorScheme.error)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text("Liikennetiedote", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.error)
             Text(notice.title, style = MaterialTheme.typography.titleMedium)
             notice.location?.let { Text(it, style = MaterialTheme.typography.bodySmall, maxLines = 3, overflow = TextOverflow.Ellipsis) }
-            if (notice.description.isNotBlank()) Text(notice.description, style = MaterialTheme.typography.bodyMedium, maxLines = 3, overflow = TextOverflow.Ellipsis)
             Text("Julkaistu ${formatDate(notice.published)}", style = MaterialTheme.typography.bodySmall)
             if (notice.updated != notice.published) Text("Päivitetty ${formatDate(notice.updated)}", style = MaterialTheme.typography.bodySmall)
             Text("${distanceLabel(item.distance)} · Fintraffic / Digitraffic", style = MaterialTheme.typography.bodySmall)
+            }
         }
     }
     if (details) {
@@ -69,7 +68,7 @@ fun TrafficSettingsContent(vm: TrafficViewModel, weather: WeatherViewModel) {
     val located by weather.currentLocation.collectAsStateWithLifecycle()
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         HorizontalDivider()
-        Text("Lähialueen liikennetiedotteet", style = MaterialTheme.typography.titleMedium)
+        SettingsHeading("Liikennetiedotteet", R.drawable.ic_traffic)
         Row {
             Text("Näytä liikennetiedotteet", Modifier.weight(1f))
             Switch(settings.enabled, vm::enabled, modifier = Modifier.semantics { contentDescription = "Näytä lähialueen liikennetiedotteet" })

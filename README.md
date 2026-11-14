@@ -1,12 +1,12 @@
 # Uutishetki
 
-Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.6.0**, versionCode **9**.
+Suomenkielinen Android-uutislukija omaan ja pienen ystäväpiirin käyttöön. Kotlin ja Jetpack Compose, Android 8.0 tai uudempi. Pysyvä applicationId: `fi.uutishetki`. Versio **0.7.0**, versionCode **10**.
 
 Uutiset näkyvät uusimmat ensin yhteisessä virrassa. Lähdesuodatin ja pysyvä aiheiden monivalinta (oletuksena kaikki paitsi Urheilu), lyhyet RSS-kuvaukset, syötteen kuvat ja alkuperäisten artikkelien avaaminen Custom Tabsissa / selaimessa. Ei mainos-, analytiikka- tai AI-SDK:ita, tilejä eikä palvelinta. Julkaisijoiden sivujen mainoksia, evästeitä ja maksumuureja ei muuteta.
 
 ## Valmis APK
 
-[Lataa Uutishetki 0.6.0 release-APK](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.6.0/Uutishetki-0.6.0.apk). Julkaistu 12.11.2026 samalla pysyvällä release-avaimella kuin 0.5.1. [Julkaisun tarkistukset](https://github.com/Tenuxi/Uutishetki/actions/runs/43168340272) onnistuivat. [Uusin julkaisu](https://github.com/Tenuxi/Uutishetki/releases/latest).
+[Lataa uusimman julkaisun APK](https://github.com/Tenuxi/Uutishetki/releases/latest). Avaa julkaisun Assets ja valitse `Uutishetki-<versio>.apk`. Release-APK käyttää versiosta 0.5.1 alkaen samaa pysyvää allekirjoitusavainta.
 
 **Siirtyminen vanhasta debug-asennuksesta vaatii poistamisen kerran, jolloin paikalliset tiedot ja asetukset häviävät.** Tästä versiosta alkaen sama julkaisuavain ja kasvava versionCode mahdollistavat tulevat päivitykset vanhan päälle. Päivitysasennusta ei ole testattu fyysisellä laitteella. [Allekirjoitus ja varmuuskopiointi](docs/SIGNING.md).
 

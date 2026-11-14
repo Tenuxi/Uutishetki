@@ -86,3 +86,14 @@ Paikallisesti vain XML-jäsennys, diff- ja julkaisumetatietojen tarkistus. Testi
 0.6.0:n [Actions-tarkistus 43168097454](https://github.com/Tenuxi/Uutishetki/actions/runs/43168097454) onnistui: 48 Android-yksikkötestiä, 0 virhettä, 0 ohitettua. Lisäksi kolme julkaisusuojauksen Python-testiä, Android Lint ja koekäännös läpäistiin.
 
 [Julkaisuajo 43168340272](https://github.com/Tenuxi/Uutishetki/actions/runs/43168340272) onnistui samalla pysyvällä varmenteella kuin 0.5.1. Julkaistusta APK:sta tarkistettiin lisäksi latauksen SHA-256-tiiviste, APK v2 -varmenne, applicationId `fi.uutishetki`, versionCode 9, versionName 0.6.0 ja ei-debug-tila. [Lataa 0.6.0](https://github.com/Tenuxi/Uutishetki/releases/download/apk-0.6.0/Uutishetki-0.6.0.apk). Fyysistä päivitysasennusta ei testattu.
+
+
+## 0.7.0 — koko sovelluksen teema ja ulkoasu
+
+Kolme teemalogiikan testiä: puuttuva/tuntematon tallennettu arvo seuraa järjestelmää, kaikki enum-nimet palautuvat, vaalea/tumma ohittavat järjestelmävalinnan ja sama SYSTEM-valinta reagoi järjestelmäteeman vaihtoon. SharedPreferences `appearance/mode` on erillinen uutis-, sää- ja liikenneasetuksista; valinta kirjoitetaan heti. Compose `isSystemInDarkTheme()` seuraa järjestelmän Configuration-muutoksia. Teeman vaihto ei vaihda NewsScreenin identiteettiä eikä kutsu suodatus-, päivitys- tai vieritysmetodeja.
+
+Kevyt tarkistus: resurssien XML ja julkaisumetadata jäsentyivät. Molempien palettien pääteksti-, lisäteksti-, valinta-, liikenne- ja korostustekstien kontrastit laskettiin: tarkistetut parit vähintään 6,37:1. Uutiskuvien renderöintiin ei lisätty värisuodatusta. Kortit ilman kuvaa jättävät kuva-alueen kokonaan pois. Lehtipainikkeiden koko nimi rivittyy ilman ellipsiä; kirjainmerkki ja valintamerkki ovat erillisellä rivillä. Ruudukko vaihtuu yhteen sarakkeeseen alle 280 dp sisältöleveydellä tai fontScale > 1,2. Sääennusteet pinoutuvat alle 320 dp leveydellä tai fontScale > 1,3. Vieritys, kosketusalueet ja safeDrawing-insetit säilyvät.
+
+Havainnekuvia ei ollut tämän tehtävän liitteenä; toteutus perustuu kirjallisiin vaatimuksiin. Mukana toimitettavia vektorisääkuvakkeita käytetään eri säätiloille, kirkkaalle yölle kuuta. Ei ajonaikaista kuvagenerointia tai uusia riippuvuuksia.
+
+Ei visuaalista laite- tai emulaattoritestiä eikä paikallista Android-buildia. Laitteella testaamatta: järjestelmäteeman vaihtuminen avoinna, valinnan palautuminen prosessin tappamisen jälkeen, lukukohdan pysyminen todellisessa teemanvaihdossa, pienin näyttö/suurin tekstikoko/vaaka-asento/TalkBack, Androidin järjestelmäpalkit ja päivitysasennus. Kontrastilaskenta ei korvaa näitä tarkistuksia. Varsinaiset testit, Lint ja build tehdään Actionsissa.

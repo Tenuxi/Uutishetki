@@ -76,25 +76,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState?.getBoolean("externalReturn") == true) newsModel.opening.restoreExternalReturn()
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.light(0xFFF4F4F4.toInt(), 0xFF303030.toInt())
-        )
-        setContent {
-            MaterialTheme(colorScheme = lightColorScheme(
-                primary = Color(0xFF405D78), onPrimary = Color.White, surfaceTint = Color(0xFF405D78),
-                primaryContainer = Color(0xFFDCE6F0), onPrimaryContainer = Color(0xFF182D40),
-                secondary = Color(0xFF4D6072), onSecondary = Color.White,
-                secondaryContainer = Color(0xFFDCE6F0), onSecondaryContainer = Color(0xFF182D40),
-                tertiary = Color(0xFF4D6072),
-                background = Color(0xFFD4D4D4), surface = Color.White,
-                onBackground = Color(0xFF171717), onSurface = Color(0xFF171717),
-                surfaceVariant = Color(0xFFE8E8E8), onSurfaceVariant = Color(0xFF494949),
-                surfaceContainer = Color(0xFFF3F3F3), surfaceContainerLow = Color(0xFFF7F7F7),
-                surfaceContainerHigh = Color(0xFFEEEEEE), surfaceContainerHighest = Color(0xFFE8E8E8),
-                outline = Color(0xFF777777), outlineVariant = Color(0xFFCCCCCC)
-            )) { NewsScreen(vm = newsModel) }
-        }
+        setContent { UutishetkiTheme(this) { NewsScreen(vm = newsModel) } }
     }
 }
 private val brandFont = FontFamily(Font(R.font.roboto_regular))
@@ -261,19 +243,19 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
         }
         Surface(modifier = Modifier.align(Alignment.TopCenter).fillMaxWidth()
             .onSizeChanged { measuredHeaderPixels = it.height },
-            color = Color.White.copy(alpha = 0.94f), tonalElevation = 0.dp) {
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f), tonalElevation = 0.dp) {
             Column(Modifier.statusBarsPadding()) {
                 Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).padding(horizontal = 16.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically) {
                     Text("Uutishetki", modifier = Modifier.weight(1f), fontFamily = brandFont,
-                        style = MaterialTheme.typography.titleLarge, color = Color.Black,
+                        style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1, overflow = TextOverflow.Ellipsis)
                     if (weatherSettings.enabled) WeatherButton(weatherState) { vm.opening.userInteracted(); weatherDetails = true }
                     IconButton(onClick = openDrawer, modifier = Modifier.size(48.dp)) {
-                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "Avaa valikko", tint = Color.Black)
+                        Icon(painterResource(R.drawable.ic_menu), contentDescription = "Avaa valikko", tint = MaterialTheme.colorScheme.onSurface)
                     }
                 }
-                HorizontalDivider(thickness = 0.5.dp, color = Color(0xFF555555))
+                HorizontalDivider(thickness = 0.5.dp, color = MaterialTheme.colorScheme.outline)
             }
         }
     }
@@ -290,7 +272,7 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
         text = { Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Text("Rauhallinen uutislukija yksityiseen käyttöön. Ei omia mainoksia, analytiikkaa tai käyttäjätilejä.")
             Text("Nimen Roboto-kirjasin: Google, Apache License 2.0. Lisenssi sisältyy sovelluksen tiedostoihin.", style = MaterialTheme.typography.bodySmall)
-            Text("Lähteet: Iltalehti, Ilta-Sanomat, Yle Uusimaa, Yle Häme (Kanta-Häme) Helsingin Sanomat, Stara ja Pelaaja. Kaikissa syötteissä ei ole kuvia tai kattavaa aiheluokitusta.")
+            Text("Lähteet: Iltalehti, Ilta-Sanomat, Yle Uusimaa, Yle Häme (Kanta-Häme), Helsingin Sanomat, Stara ja Pelaaja. Kaikissa syötteissä ei ole kuvia tai kattavaa aiheluokitusta.")
             Text("Uutiset ja kuvat haetaan suoraan julkaisijoilta, jotka näkevät verkkopyynnön ja IP-osoitteen. Artikkelisivuilla voi olla mainoksia, seurantaa ja maksumuureja.")
             Text("Tallennetut otsikot ja kuvaukset toimivat ilman verkkoa. Kuvat ovat rajatussa välimuistissa, eikä niiden offline-saatavuutta taata. Sisällön oikeudet kuuluvat julkaisijoille.")
         } })
@@ -299,7 +281,7 @@ fun NewsScreen(vm: NewsViewModel = viewModel(), weather: WeatherViewModel = view
 private fun NewsCard(news: News) {
     val context = LocalContext.current
     Card(onClick = { openArticle(context, news.url) }, modifier = Modifier.fillMaxWidth(),
-        border = BorderStroke(1.dp, Color(0xFFC7C7C7)),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
         news.image?.let { image ->
@@ -307,7 +289,10 @@ private fun NewsCard(news: News) {
                 modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f).background(MaterialTheme.colorScheme.surfaceVariant))
         }
         Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(news.source.label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SourceBadge(news.source)
+                Text(news.source.label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            }
             Text(news.title, style = MaterialTheme.typography.titleLarge, fontFamily = FontFamily.Serif, fontWeight = FontWeight.SemiBold)
             news.teaser?.let { Text(it, maxLines = 2, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             Text(news.published?.let(::formatDate) ?: "Julkaisuaika ei saatavilla", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

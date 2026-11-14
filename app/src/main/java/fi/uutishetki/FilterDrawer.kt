@@ -52,7 +52,7 @@ fun RightFilterDrawer(
                             drawerState = drawerState,
                             modifier = Modifier.width(panelWidth).fillMaxHeight().shadow(12.dp, panelShape, clip = false),
                             drawerShape = panelShape,
-                            drawerContainerColor = Color.White,
+                            drawerContainerColor = MaterialTheme.colorScheme.surface,
                             drawerContentColor = MaterialTheme.colorScheme.onSurface,
                             drawerTonalElevation = 0.dp,
                             windowInsets = WindowInsets.safeDrawing
@@ -68,14 +68,24 @@ fun RightFilterDrawer(
                             }
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                             LazyColumn(Modifier.weight(1f).fillMaxWidth(),
-                                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 20.dp),
-                                verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)) {
                                 item {
                                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                         GroupTitle("Lehdet")
                                         SelectionChip("Kaikki lehdet", selection.source == null, { onSource(null) }, Modifier.fillMaxWidth())
-                                        Source.entries.forEach { source ->
-                                            SelectionChip(source.label, selection.source == source, { onSource(source) }, Modifier.fillMaxWidth())
+                                        BoxWithConstraints {
+                                            val columns = if (maxWidth >= 280.dp && androidx.compose.ui.platform.LocalDensity.current.fontScale <= 1.2f) 2 else 1
+                                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                                Source.entries.chunked(columns).forEach { row ->
+                                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                        row.forEach { source ->
+                                                            SelectionChip(source.label, selection.source == source, { onSource(source) }, Modifier.weight(1f), source)
+                                                        }
+                                                        if (row.size < columns) Spacer(Modifier.weight(1f))
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -97,6 +107,7 @@ fun RightFilterDrawer(
                                         Text("Palauta oletukset")
                                     }
                                 }
+                                item { AppearanceSettings() }
                                 item { WeatherSettingsContent(weather, onAutomaticWeather) }
                                 item { TrafficSettingsContent(traffic, weather) }
                                 // Footer shares the scroll container so it cannot overlap the choices.
@@ -129,23 +140,33 @@ private fun GroupTitle(label: String) {
 }
 
 @Composable
-private fun SelectionChip(label: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun SelectionChip(label: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier, source: Source? = null) {
     FilterChip(
         selected = selected,
         onClick = onClick,
         modifier = modifier.heightIn(min = 48.dp),
         shape = RoundedCornerShape(16.dp),
-        label = { Text(label) },
-        leadingIcon = if (selected) { {
+        label = {
+            if (source == null) Text(label)
+            else Column(Modifier.padding(vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    SourceBadge(source)
+                    Spacer(Modifier.weight(1f))
+                    if (selected) Icon(painterResource(R.drawable.ic_check), null, Modifier.size(16.dp))
+                }
+                Text(label)
+            }
+        },
+        leadingIcon = if (source == null && selected) { {
             Icon(painterResource(R.drawable.ic_check), contentDescription = null, modifier = Modifier.size(16.dp))
         } } else null,
         colors = FilterChipDefaults.filterChipColors(
-            containerColor = Color(0xFFFAFAFA),
-            selectedContainerColor = Color(0xFFDCE6F0),
-            selectedLabelColor = Color(0xFF182D40),
-            selectedLeadingIconColor = Color(0xFF405D78)
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            selectedLeadingIconColor = MaterialTheme.colorScheme.primary
         ),
         border = FilterChipDefaults.filterChipBorder(enabled = true, selected = selected,
-            borderColor = Color(0xFFD1D5D9), selectedBorderColor = Color(0xFFB9C9D8))
+            borderColor = MaterialTheme.colorScheme.outlineVariant, selectedBorderColor = MaterialTheme.colorScheme.primary)
     )
 }

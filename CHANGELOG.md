@@ -1,5 +1,16 @@
 # Muutosloki
 
+## 0.7.0 — 14.11.2026
+
+- Yhtenäinen vaalea ja tumma ilme koko sovellukseen. Ulkoasu-valinnat Järjestelmän mukaan (oletus), Vaalea ja Tumma vaihtuvat heti ja tallentuvat päivitysten yli.
+- Teemaan mukautuvat yläpalkki, Androidin järjestelmäpalkit, kortit, dialogit, sääpaneeli ja asetukset. Uutiskuvia ei tummenneta.
+- Uutiskorteissa ja lehtivalinnoissa omat pyöreät kirjainmerkit. Serif-otsikot ja nykyinen sisältö säilyvät.
+- Sivupaneelin lehdet kahdessa sarakkeessa, pienessä tilassa tai suurella tekstillä yhdessä. Asetukset ryhmitelty Ulkoasuun, säähän/sijaintiin ja liikenteeseen.
+- Kompaktimmat liikennekortit tunnisteineen, punertava vaalea pinta ja tumma viininpunainen pinta. Koko tiedote avautuu ennallaan.
+- Sääpaneelissa teemakohtaiset siniset pinnat, suurempi säägrafiikka ja mukautuvat ennustekortit.
+- Sama applicationId ja pysyvä release-avain; versionCode 10. Uutislähteitä, suodatusta tai käyttäjän aiempia asetuksia ei vaihdeta.
+
+
 ## 0.6.0 — 12.11.2026
 
 - Lisätty Stara ja Pelaaja lehtivalintoihin. Staran aiheet tulevat kategorioista, Pelaajan pelisyöte kuuluu Digiin. Kaikki-valinta sisältää uudet lehdet; aiemmat rajaukset säilyvät.

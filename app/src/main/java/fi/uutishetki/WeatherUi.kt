@@ -59,7 +59,7 @@ fun WeatherDetails(state: WeatherUiState, onSettings: () -> Unit, onDismiss: () 
             val availableHeight = maxHeight
             Surface(Modifier.widthIn(max = 560.dp).fillMaxWidth().heightIn(max = availableHeight),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-                color = androidx.compose.ui.graphics.Color(0xFFF0F4F8), tonalElevation = 0.dp) {
+                color = LocalAppSurfaces.current.weather, contentColor = MaterialTheme.colorScheme.onSurface, tonalElevation = 0.dp) {
                 Column(Modifier.padding(16.dp)) {
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Column(Modifier.weight(1f)) {
@@ -85,7 +85,7 @@ fun WeatherDetails(state: WeatherUiState, onSettings: () -> Unit, onDismiss: () 
                                 Text("Aiempi säätieto ja ennuste – ajantasaisuutta ei voitu varmistaa.", color = MaterialTheme.colorScheme.error)
                             }
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                                WeatherIcon(weatherSymbol(data.code, data.isDay), Modifier.size(56.dp))
+                                WeatherIcon(weatherSymbol(data.code, data.isDay), Modifier.size(72.dp))
                                 Column {
                                     Text(data.temperatureLabel, style = MaterialTheme.typography.displayMedium,
                                         fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
@@ -95,7 +95,7 @@ fun WeatherDetails(state: WeatherUiState, onSettings: () -> Unit, onDismiss: () 
                         } else if (!state.loading) Text("Säätieto ei saatavilla.")
                         BoxWithConstraints(Modifier.fillMaxWidth()) {
                             val dates = forecastDates(state.now)
-                            if (maxWidth >= 360.dp && fontScale <= 1.3f) {
+                            if (maxWidth >= 320.dp && fontScale <= 1.3f) {
                                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                                     dates.forEachIndexed { index, date ->
                                         ForecastCard(index, date, data?.forecast?.find { it.date == date }, state.loading, Modifier.weight(1f))
@@ -131,7 +131,7 @@ fun WeatherDetails(state: WeatherUiState, onSettings: () -> Unit, onDismiss: () 
 
 @Composable
 private fun ForecastCard(index: Int, date: java.time.LocalDate, forecast: DailyForecast?, loading: Boolean, modifier: Modifier) {
-    Surface(modifier, shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp), color = androidx.compose.ui.graphics.Color.White) {
+    Surface(modifier, shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp), color = LocalAppSurfaces.current.weatherCard, contentColor = MaterialTheme.colorScheme.onSurface) {
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(if (index == 0) "Huomenna" else "Ylihuomenna", style = MaterialTheme.typography.titleSmall)
             Text(date.format(java.time.format.DateTimeFormatter.ofPattern("d.M.")), style = MaterialTheme.typography.bodySmall)
@@ -174,7 +174,7 @@ fun WeatherSettingsContent(vm: WeatherViewModel, onAutomatic: () -> Unit) {
     val located by vm.currentLocation.collectAsStateWithLifecycle()
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         HorizontalDivider()
-        Text("Paikallinen sää", style = MaterialTheme.typography.titleMedium)
+        SettingsHeading("Sää ja sijainti", R.drawable.weather_sun)
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text("Näytä sää yläpalkissa", Modifier.weight(1f))
             Switch(checked = settings.enabled, onCheckedChange = vm::enabled,
